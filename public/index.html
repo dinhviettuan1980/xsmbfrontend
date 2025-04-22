@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>XSMB Tra cứu</title>
+  <script>
+    if (typeof window.zaloJSV2 === 'undefined') {
+      window.zaloJSV2 = {};
+    }
+  
+    if (typeof window.zaloJSV2.zalo_h5_event_handler !== 'function') {
+      window.zaloJSV2.zalo_h5_event_handler = function() {
+        console.warn('zalo_h5_event_handler fallback called.');
+      };
+    }
+  </script>  
+</head>
+<body>
+  <div id="root"></div>
+</body>
+</html>

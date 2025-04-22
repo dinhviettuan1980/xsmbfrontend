@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.open1 {
+    display: block;
+  }
+
+.close1 {
+    display: none;
+}
+  
+.main-content {
+    margin-top: 0; /* mặc định */
+  }
