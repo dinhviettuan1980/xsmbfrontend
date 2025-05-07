@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import Home from "./Home";
@@ -8,6 +7,7 @@ import LongestAbsentPage from "./LongestAbsentPage";
 import CombinationAdvancedPage from "./CombinationAdvancedPage";
 import ClassifyPage from "./ClassifyPage";
 import SpecialsPage from "./SpecialsPage";
+import CombinationGeneratorPage from "./CombinationGeneratorPage"; // THÊM
 import "./index.css";
 
 function App() {
@@ -20,6 +20,7 @@ function App() {
     { label: "🔀 Tổ hợp nâng cao", path: "/combination-advanced" },
     { label: "🧮 Phân loại 2 chữ số", path: "/classify" },
     { label: "🏆 Giải đặc biệt", path: "/specials" },
+    { label: "🛠️ Sinh tổ hợp (new)", path: "/generate-combinations" }, // THÊM MỤC MỚI
   ];
 
   return (
@@ -27,8 +28,8 @@ function App() {
       <div className="min-h-screen relative bg-gray-50">
         {/* Sidebar */}
         <aside
-          className={\`fixed top-0 left-0 h-full w-64 bg-white shadow-lg z-50 transform transition-transform duration-300
-            \${menuOpen ? 'translate-x-0' : '-translate-x-full'}\`}
+          className={`fixed top-0 left-0 h-full w-64 bg-white shadow-lg z-50 transform transition-transform duration-300
+            ${menuOpen ? 'translate-x-0' : '-translate-x-full'}`}
         >
           <div className="p-4 text-xl font-bold border-b">📋 Menu</div>
           <ul className="p-4 space-y-3">
@@ -71,6 +72,7 @@ function App() {
             <Route path="/combination-advanced" element={<CombinationAdvancedPage />} />
             <Route path="/classify" element={<ClassifyPage />} />
             <Route path="/specials" element={<SpecialsPage />} />
+            <Route path="/generate-combinations" element={<CombinationGeneratorPage />} /> {/* THÊM ROUTE */}
           </Routes>
         </main>
       </div>

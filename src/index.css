@@ -13,3 +13,7 @@
 .main-content {
     margin-top: 0; /* mặc định */
   }
+
+  html {
+    font-size: 120%; /* tăng 20% toàn bộ hệ thống */
+  }
