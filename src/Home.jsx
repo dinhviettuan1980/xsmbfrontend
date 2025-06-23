@@ -54,7 +54,7 @@ function Home() {
 
   const fetchData = async (targetDate) => {
     try {
-      const res = await axios.get(`https://api.tuandv.asia/api/history?date=${targetDate}`);
+      const res = await axios.get(`http://13.55.124.215:8001/api/history?date=${targetDate}`);
       setData(res.data);
     } catch (err) {
       console.error("Lỗi lấy dữ liệu:", err);

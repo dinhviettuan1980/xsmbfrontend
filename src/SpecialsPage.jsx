@@ -8,7 +8,7 @@ function SpecialsPage() {
   const [grouped, setGrouped] = useState([]);
 
   useEffect(() => {
-    axios.get("https://api.tuandv.asia/api/specials/recent").then(res => {
+    axios.get("http://13.55.124.215:8001/api/specials/recent").then(res => {
       const data = res.data;
 
       if (!data.length) return;

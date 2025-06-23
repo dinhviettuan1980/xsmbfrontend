@@ -44,7 +44,7 @@ function StatisticPage() {
   const fetchStats = async () => {
     if (!numbers || !days) return;
     try {
-      const response = await axios.get(`https://api.tuandv.asia/api/statistics/frequency`, {
+      const response = await axios.get(`http://13.55.124.215:8001/api/statistics/frequency`, {
         params: {
           days,
           numbers

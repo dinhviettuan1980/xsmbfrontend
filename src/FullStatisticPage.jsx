@@ -15,7 +15,7 @@ function FullStatisticPage() {
 
   const fetchFullStats = async () => {
     try {
-      const response = await axios.get('https://api.tuandv.asia/api/statistics/frequency-full', {
+      const response = await axios.get('http://13.55.124.215:8001/api/statistics/frequency-full', {
         params: { days }
       });
       setResult(response.data);

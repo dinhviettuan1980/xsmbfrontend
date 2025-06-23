@@ -12,7 +12,7 @@ function LongestAbsentPage() {
 
   const fetchData = async () => {
     try {
-      const res = await axios.get('https://api.tuandv.asia/api/statistics/longest-absent', {
+      const res = await axios.get('http://13.55.124.215:8001/api/statistics/longest-absent', {
         params: { days }
       });
       setResult(res.data);

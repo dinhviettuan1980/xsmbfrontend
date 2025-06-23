@@ -20,7 +20,7 @@ function CombinationAdvancedPage() {
 
     setError("");
 
-    const base = "https://api.tuandv.asia/api";
+    const base = "http://13.55.124.215:8001/api";
     let url = from && to ? `${base}/combination-advanced` : `${base}/combination`;
     let params = { number: digits };
     if (from && to) {

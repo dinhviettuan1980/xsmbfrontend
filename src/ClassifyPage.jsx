@@ -7,7 +7,7 @@ function ClassifyPage() {
   const [copiedKey, setCopiedKey] = useState(null);
 
   useEffect(() => {
-    axios.get("https://api.tuandv.asia/api/classify-two-digit").then(res => setData(res.data));
+    axios.get("http://13.55.124.215:8001/api/classify-two-digit").then(res => setData(res.data));
   }, []);
 
   return (

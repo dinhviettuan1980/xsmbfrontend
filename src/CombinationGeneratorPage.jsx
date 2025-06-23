@@ -27,7 +27,7 @@ function CombinationGeneratorPage() {
         if (cang3 !== "") payload.cang3 = parseInt(cang3);
         if (cang4 !== "") payload.cang4 = parseInt(cang4);
 
-        const res = await axios.post("https://api.tuandv.asia/api/generate-combinations", payload);
+        const res = await axios.post("http://13.55.124.215:8001/api/generate-combinations", payload);
         const groupResults = res.data.map(r => r.fourDigit || r.threeDigit || r.twoDigit);
         allResults = allResults.concat(groupResults);
       } catch (error) {
