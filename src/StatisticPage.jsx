@@ -44,7 +44,8 @@ function StatisticPage() {
   const fetchStats = async () => {
     if (!numbers || !days) return;
     try {
-      const response = await axios.get(`http://13.55.124.215:8001/api/statistics/frequency`, {
+      const baseUrl = process.env.REACT_APP_API_BASE;
+      const response = await axios.get(`${baseUrl}/api/statistics/frequency`, {
         params: {
           days,
           numbers

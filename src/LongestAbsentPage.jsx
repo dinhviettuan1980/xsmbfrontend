@@ -12,7 +12,8 @@ function LongestAbsentPage() {
 
   const fetchData = async () => {
     try {
-      const res = await axios.get('http://13.55.124.215:8001/api/statistics/longest-absent', {
+      const baseUrl = process.env.REACT_APP_API_BASE;
+      const res = await axios.get(`${baseUrl}/api/statistics/longest-absent`, {
         params: { days }
       });
       setResult(res.data);

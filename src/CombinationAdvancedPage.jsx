@@ -19,8 +19,9 @@ function CombinationAdvancedPage() {
     }
 
     setError("");
-
-    const base = "http://13.55.124.215:8001/api";
+    
+    const baseUrl = process.env.REACT_APP_API_BASE;
+    const base = baseUrl + "/api";
     let url = from && to ? `${base}/combination-advanced` : `${base}/combination`;
     let params = { number: digits };
     if (from && to) {

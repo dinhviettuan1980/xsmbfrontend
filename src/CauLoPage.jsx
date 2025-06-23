@@ -11,17 +11,18 @@ function CauLoPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const pascalRes = await axios.get("http://13.55.124.215:8001/api/cau-lo-pascal");
+        const baseUrl = process.env.REACT_APP_API_BASE;
+        const pascalRes = await axios.get(`${baseUrl}/api/cau-lo-pascal`);
         setPascalTriangle(pascalRes.data.triangle || []);
         setPascalPredictions(pascalRes.data.predictions || []);
 
-        const phongRes = await axios.get("http://13.55.124.215:8001/api/cau-ong-phong");
+        const phongRes = await axios.get(`${baseUrl}/api/cau-ong-phong`);
         setOngPhongResult(phongRes.data || null);
 
-        const phongStatsRes = await axios.get("http://13.55.124.215:8001/api/tk-cau-ong-phong");
+        const phongStatsRes = await axios.get(`${baseUrl}/api/tk-cau-ong-phong`);
         setOngPhongStats(phongStatsRes.data["tk-cau-ong-phong-short"] || []);
 
-        const pascalStatsRes = await axios.get("http://13.55.124.215:8001/api/tk-cau-lo-pascal");
+        const pascalStatsRes = await axios.get(`${baseUrl}/api/tk-cau-lo-pascal`);
         setPascalStats(pascalStatsRes.data["tk-cau-lo-pascal-short"] || []);
       } catch (error) {
         console.error("Error fetching data:", error);

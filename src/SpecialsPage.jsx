@@ -8,7 +8,8 @@ function SpecialsPage() {
   const [grouped, setGrouped] = useState([]);
 
   useEffect(() => {
-    axios.get("http://13.55.124.215:8001/api/specials/recent").then(res => {
+    const baseUrl = process.env.REACT_APP_API_BASE;
+    axios.get(`${baseUrl}/api/specials/recent`).then(res => {
       const data = res.data;
 
       if (!data.length) return;

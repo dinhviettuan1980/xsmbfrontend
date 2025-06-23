@@ -7,7 +7,8 @@ function ClassifyPage() {
   const [copiedKey, setCopiedKey] = useState(null);
 
   useEffect(() => {
-    axios.get("http://13.55.124.215:8001/api/classify-two-digit").then(res => setData(res.data));
+    const baseUrl = process.env.REACT_APP_API_BASE;
+    axios.get(`${baseUrl}/api/classify-two-digit`).then(res => setData(res.data));
   }, []);
 
   return (
