@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import apiClient from './utils/apiClient';
 
 function StatisticPage() {
   const [numbers, setNumbers] = useState('');
@@ -45,7 +45,7 @@ function StatisticPage() {
     if (!numbers || !days) return;
     try {
       const baseUrl = process.env.REACT_APP_API_BASE;
-      const response = await axios.get(`${baseUrl}/api/statistics/frequency`, {
+      const response = await apiClient.get(`${baseUrl}/api/statistics/frequency`, {
         params: {
           days,
           numbers

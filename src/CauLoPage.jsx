@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import apiClient from './utils/apiClient';
 
 function CauLoPage() {
   const [pascalTriangle, setPascalTriangle] = useState([]);
@@ -12,17 +12,17 @@ function CauLoPage() {
     const fetchData = async () => {
       try {
         const baseUrl = process.env.REACT_APP_API_BASE;
-        const pascalRes = await axios.get(`${baseUrl}/api/cau-lo-pascal`);
+        const pascalRes = await apiClient.get(`${baseUrl}/api/cau-lo-pascal`);
         setPascalTriangle(pascalRes.data.triangle || []);
         setPascalPredictions(pascalRes.data.predictions || []);
 
-        const phongRes = await axios.get(`${baseUrl}/api/cau-ong-phong`);
+        const phongRes = await apiClient.get(`${baseUrl}/api/cau-ong-phong`);
         setOngPhongResult(phongRes.data || null);
 
-        const phongStatsRes = await axios.get(`${baseUrl}/api/tk-cau-ong-phong`);
+        const phongStatsRes = await apiClient.get(`${baseUrl}/api/tk-cau-ong-phong`);
         setOngPhongStats(phongStatsRes.data["tk-cau-ong-phong-short"] || []);
 
-        const pascalStatsRes = await axios.get(`${baseUrl}/api/tk-cau-lo-pascal`);
+        const pascalStatsRes = await apiClient.get(`${baseUrl}/api/tk-cau-lo-pascal`);
         setPascalStats(pascalStatsRes.data["tk-cau-lo-pascal-short"] || []);
       } catch (error) {
         console.error("Error fetching data:", error);

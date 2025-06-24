@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { CopyToClipboard } from "react-copy-to-clipboard";
+import apiClient from './utils/apiClient';
 
 function CombinationGeneratorPage() {
   const [selectedGroups, setSelectedGroups] = useState([]);
@@ -28,7 +28,7 @@ function CombinationGeneratorPage() {
         if (cang4 !== "") payload.cang4 = parseInt(cang4);
 
         const baseUrl = process.env.REACT_APP_API_BASE;
-        const res = await axios.post(`${baseUrl}/api/generate-combinations`, payload);
+        const res = await apiClient.post(`${baseUrl}/api/generate-combinations`, payload);
         const groupResults = res.data.map(r => r.fourDigit || r.threeDigit || r.twoDigit);
         allResults = allResults.concat(groupResults);
       } catch (error) {

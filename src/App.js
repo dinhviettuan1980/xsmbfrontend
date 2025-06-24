@@ -11,6 +11,8 @@ import SpecialsPage from './SpecialsPage';
 import CombinationGeneratorPage from './CombinationGeneratorPage';
 import CauLoPage from './CauLoPage';
 import CauDePage from './CauDePage';
+import GoogleLogin from './GoogleLogin';
+import LogoutPage from './LogoutPage';
 import './index.css';
 
 function App() {
@@ -38,6 +40,8 @@ function App() {
             <li><Link to="/specials" onClick={() => setMenuOpen(false)}>🎯 Giải đặc biệt 2 tháng</Link></li>
             <li><Link to="/cau-lo" onClick={() => setMenuOpen(false)}>🎯 Cầu Lô</Link></li>
             <li><Link to="/cau-de" onClick={() => setMenuOpen(false)}>🎯 Cầu Đề</Link></li>
+            <li><Link to="/login" onClick={() => setMenuOpen(false)}>🎯 Login Google</Link></li>
+            <li><Link to="/logout" onClick={() => setMenuOpen(false)}>🎯 Logout</Link></li>
           </ul>
         </div>
 
@@ -53,6 +57,8 @@ function App() {
             <Route path="/specials" element={<SpecialsPage />} />
             <Route path="/cau-lo" element={<CauLoPage />} />
             <Route path="/cau-de" element={<CauDePage />} />
+            <Route path="/login" element={<GoogleLogin />} />
+            <Route path="/logout" element={<LogoutPage />} />
           </Routes>
         </div>
       </div>

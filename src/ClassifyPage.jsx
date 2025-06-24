@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { CopyToClipboard } from "react-copy-to-clipboard";
+import apiClient from './utils/apiClient';
 
 function ClassifyPage() {
   const [data, setData] = useState({});
@@ -8,7 +8,7 @@ function ClassifyPage() {
 
   useEffect(() => {
     const baseUrl = process.env.REACT_APP_API_BASE;
-    axios.get(`${baseUrl}/api/classify-two-digit`).then(res => setData(res.data));
+    apiClient.get(`${baseUrl}/api/classify-two-digit`).then(res => setData(res.data));
   }, []);
 
   return (

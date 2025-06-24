@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import apiClient from './utils/apiClient';
 
 function HeadTailTable({ headToTail, tailToHead }) {
   const renderTable = (map, label1, label2) => (
@@ -55,7 +55,12 @@ function Home() {
   const fetchData = async (targetDate) => {
     try {
       const baseUrl = process.env.REACT_APP_API_BASE;
-      const res = await axios.get(`${baseUrl}/api/history?date=${targetDate}`);
+      const idToken = localStorage.getItem('google_id_token');
+
+      if (!date) return null;
+      
+      const res = await apiClient.get(`/api/history?date=${date}`);
+
       setData(res.data);
     } catch (err) {
       console.error("Lỗi lấy dữ liệu:", err);

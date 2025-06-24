@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import apiClient from './utils/apiClient';
 
 function LongestAbsentPage() {
   const [days, setDays] = useState(30);
@@ -13,7 +13,7 @@ function LongestAbsentPage() {
   const fetchData = async () => {
     try {
       const baseUrl = process.env.REACT_APP_API_BASE;
-      const res = await axios.get(`${baseUrl}/api/statistics/longest-absent`, {
+      const res = await apiClient.get(`${baseUrl}/api/statistics/longest-absent`, {
         params: { days }
       });
       setResult(res.data);

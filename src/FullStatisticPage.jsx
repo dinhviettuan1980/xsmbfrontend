@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import apiClient from './utils/apiClient';
 
 function FullStatisticPage() {
   const [days, setDays] = useState(30);
@@ -16,7 +16,7 @@ function FullStatisticPage() {
   const fetchFullStats = async () => {
     try {
       const baseUrl = process.env.REACT_APP_API_BASE;
-      const response = await axios.get(`${baseUrl}/api/statistics/frequency-full`, {
+      const response = await apiClient.get(`${baseUrl}/api/statistics/frequency-full`, {
         params: { days }
       });
       setResult(response.data);

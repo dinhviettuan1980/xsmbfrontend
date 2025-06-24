@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { CopyToClipboard } from "react-copy-to-clipboard";
+import apiClient from './utils/apiClient';
 
 function CombinationAdvancedPage() {
   const [input, setInput] = useState("");
@@ -30,7 +30,7 @@ function CombinationAdvancedPage() {
     }
 
     try {
-      const res = await axios.get(url, { params });
+      const res = await apiClient.get(url, { params });
       setResult(res.data);
     } catch (err) {
       setError("Lỗi khi gọi API.");

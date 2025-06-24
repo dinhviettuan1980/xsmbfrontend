@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import apiClient from './utils/apiClient';
 
 const weekdays = ["Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "CN"];
 
@@ -9,7 +9,7 @@ function SpecialsPage() {
 
   useEffect(() => {
     const baseUrl = process.env.REACT_APP_API_BASE;
-    axios.get(`${baseUrl}/api/specials/recent`).then(res => {
+    apiClient.get(`${baseUrl}/api/specials/recent`).then(res => {
       const data = res.data;
 
       if (!data.length) return;
