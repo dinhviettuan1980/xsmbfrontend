@@ -1,6 +1,8 @@
 // src/App.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import apiClient from './utils/apiClient';
+import { isTokenExpired } from './utils/tokenUtil';
 import Home from './Home';
 import StatisticPage from './StatisticPage';
 import FullStatisticPage from './FullStatisticPage';
@@ -13,20 +15,44 @@ import CauLoPage from './CauLoPage';
 import CauDePage from './CauDePage';
 import GoogleLogin from './GoogleLogin';
 import LogoutPage from './LogoutPage';
+import ServerInfo from './ServerInfo';
 import './index.css';
 
 function App() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [username, setUsername] = useState('');
+  const [avatar, setAvatar] = useState('');
+
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        const token = localStorage.getItem('google_id_token');
+        if (token) {
+          const res = await apiClient.get('/api/me');
+          setUsername(res.data.name || res.data.email); // tuỳ backend trả về
+          setAvatar(res.data.picture);
+        }
+      } catch (err) {
+        console.error('Lỗi lấy user info:', err);
+      }
+    };
+
+    fetchUserInfo();
+  }, []);
 
   return (
     <Router>
       <div className="app-container text-base">
         <button
-          className="menu-toggle text-1xl"  // Tăng kích thước icon hamburger
+          className="menu-toggle text-6xl"  // Tăng kích thước icon hamburger
           onClick={() => setMenuOpen(!menuOpen)}
         >
-          ☰
+          ☰ 
         </button>
+        <div className="inline-flex items-center gap-2">
+          <img src={avatar} alt="avatar" className="w-8 h-8 rounded-full" />
+          <span>{username}</span>
+        </div>
 
         <div className={`sidebar ${menuOpen ? 'open1' : 'close1'}`}>
           <ul>
@@ -42,6 +68,7 @@ function App() {
             <li><Link to="/cau-de" onClick={() => setMenuOpen(false)}>🎯 Cầu Đề</Link></li>
             <li><Link to="/login" onClick={() => setMenuOpen(false)}>🎯 Login Google</Link></li>
             <li><Link to="/logout" onClick={() => setMenuOpen(false)}>🎯 Logout</Link></li>
+            <li><Link to="/server-info" onClick={() => setMenuOpen(false)}>🎯 Server Info</Link></li>
           </ul>
         </div>
 
@@ -59,6 +86,7 @@ function App() {
             <Route path="/cau-de" element={<CauDePage />} />
             <Route path="/login" element={<GoogleLogin />} />
             <Route path="/logout" element={<LogoutPage />} />
+            <Route path="/server-info" element={<ServerInfo />} />
           </Routes>
         </div>
       </div>

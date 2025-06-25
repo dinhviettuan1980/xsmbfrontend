@@ -35,6 +35,8 @@ function HeadTailTable({ headToTail, tailToHead }) {
 function Home() {
   const [date, setDate] = useState("");
   const [data, setData] = useState(null);
+  const [ongPhongResult, setOngPhongResult] = useState(null);
+  const [pascalPredictions, setPascalPredictions] = useState([]);
 
   const getYesterday = () => {
     const d = new Date();
@@ -58,6 +60,12 @@ function Home() {
       const idToken = localStorage.getItem('google_id_token');
 
       if (!date) return null;
+
+      const phongRes = await apiClient.get(`${baseUrl}/api/cau-ong-phong`);
+      setOngPhongResult(phongRes.data || null);
+
+      const pascalRes = await apiClient.get(`${baseUrl}/api/cau-lo-pascal`);
+      setPascalPredictions(pascalRes.data.predictions || []);
       
       const res = await apiClient.get(`/api/history?date=${date}`);
 
@@ -70,6 +78,7 @@ function Home() {
   const renderCenteredRow = (label, numbers, perRow = null) => {
     if (!numbers || numbers.length === 0) return null;
     const split = perRow ? [numbers.slice(0, perRow), numbers.slice(perRow)] : [numbers];
+    
     return split.map((row, rowIndex) => (
       <tr key={label + rowIndex}>
         {rowIndex === 0 && (
@@ -81,12 +90,15 @@ function Home() {
           </td>
         )}
         <td colSpan="6" className="text-center py-1">
-          <div className="flex justify-center gap-4 flex-wrap">
+          <div className="flex justify-center gap-6 flex-wrap">
             {row.map((num, idx) => (
-              <span key={idx} className="min-w-[48px] text-center">
+              <div
+                key={idx}
+                className="min-w-[64px] text-center px-2"
+              >
                 <span className="font-semibold">{num.slice(0, -2)}</span>
                 <span className="text-red-600 font-bold">{num.slice(-2)}</span>
-              </span>
+              </div>
             ))}
           </div>
         </td>
@@ -94,19 +106,21 @@ function Home() {
     ));
   };
 
+
   const getList = (str) => (str ? str.split(",") : []);
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-4 gap-2 flex-wrap">
-        <h2 className="text-lg font-bold">Tra cứu kết quả XSMB</h2>
+      <div className="flex items-center justify-between mb-4 gap-2">
+        <h2 className="text-sm font-bold whitespace-nowrap">Tra cứu kết quả XSMB</h2>
         <input
           type="date"
           value={date}
           onChange={(e) => setDate(e.target.value)}
-          className="border p-1"
+          className="border p-1 text-sm"
         />
       </div>
+
 
       {data && (
         <>
@@ -135,6 +149,30 @@ function Home() {
           )}
         </>
       )}
+
+      {ongPhongResult ? (
+        <div className="mt-4 text-lg font-semibold">
+          <p className="mt-2 text-lg">
+            Cầu Ông Phong:{" "}
+            <span className="font-bold text-green-600">
+              {ongPhongResult.predictions?.join(", ") || "Không có"}
+            </span>
+          </p>
+        </div>
+      ) : (
+        <p>Đang tải dữ liệu cầu ông Phong...</p>
+      )}
+
+      <div className="mt-4 text-lg font-semibold">
+        Cầu Pascal:{" "}
+        {pascalPredictions.length > 0 ? (
+          <span className="text-red-600">
+            {pascalPredictions.join(", ")}
+          </span>
+        ) : (
+          <span>Chưa có dữ liệu</span>
+        )}
+      </div>
     </div>
   );
 }
