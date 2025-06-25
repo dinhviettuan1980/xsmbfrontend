@@ -14,8 +14,8 @@ function HeadTailTable({ headToTail, tailToHead }) {
       <tbody>
         {Object.entries(map).map(([k, v]) => (
           <tr key={label1 + k} className="text-center even:bg-blue-50">
-            <td className="text-red-600 font-medium">{k}</td>
-            <td>{v}</td>
+            <td className="text-red-600 font-medium border p-1">{k}</td>
+            <td className="border p-1">{v}</td>
           </tr>
         ))}
       </tbody>
@@ -82,19 +82,19 @@ function Home() {
     return split.map((row, rowIndex) => (
       <tr key={label + rowIndex}>
         {rowIndex === 0 && (
-          <td
+          <td 
             rowSpan={split.length}
-            className="font-bold px-2 py-1 text-center align-middle bg-gray-100"
+            className="font-bold px-2 py-1 text-center align-middle bg-gray-100 border p-1"
           >
             {label}
           </td>
         )}
-        <td colSpan="6" className="text-center py-1">
+        <td colSpan="6" className="text-center py-1 border p-1">
           <div className="flex justify-center gap-6 flex-wrap">
             {row.map((num, idx) => (
               <div
                 key={idx}
-                className="min-w-[64px] text-center px-2"
+                className="min-w-[64px] text-center px-2 border border-gray-200 rounded bg-white"
               >
                 <span className="font-semibold">{num.slice(0, -2)}</span>
                 <span className="text-red-600 font-bold">{num.slice(-2)}</span>
@@ -128,8 +128,8 @@ function Home() {
             <table className="table-auto border text-sm w-full max-w-lg bg-white">
               <tbody>
                 <tr className="bg-blue-50">
-                  <td className="font-bold px-2 py-1 text-center bg-gray-100">ĐB</td>
-                  <td colSpan="6" className="text-center text-red-600 font-extrabold text-lg">
+                  <td className="font-bold px-2 py-1 text-center bg-gray-100 border p-1">ĐB</td>
+                  <td colSpan="6" className="text-center text-red-600 font-extrabold text-lg border p-1">
                     {data.g0}
                   </td>
                 </tr>
