@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import apiClient from './utils/apiClient';
 
@@ -37,6 +36,7 @@ function Home() {
   const [data, setData] = useState(null);
   const [ongPhongResult, setOngPhongResult] = useState(null);
   const [pascalPredictions, setPascalPredictions] = useState([]);
+  const [longestAbsent, setLongestAbsent] = useState([]);
 
   const getYesterday = () => {
     const d = new Date();
@@ -57,19 +57,21 @@ function Home() {
   const fetchData = async (targetDate) => {
     try {
       const baseUrl = process.env.REACT_APP_API_BASE;
-      const idToken = localStorage.getItem('google_id_token');
 
-      if (!date) return null;
+      if (!targetDate) return;
 
       const phongRes = await apiClient.get(`${baseUrl}/api/cau-ong-phong`);
       setOngPhongResult(phongRes.data || null);
 
       const pascalRes = await apiClient.get(`${baseUrl}/api/cau-lo-pascal`);
       setPascalPredictions(pascalRes.data.predictions || []);
-      
-      const res = await apiClient.get(`/api/history?date=${date}`);
 
+      const res = await apiClient.get(`/api/history?date=${targetDate}`);
       setData(res.data);
+
+      const absentRes = await apiClient.get(`${baseUrl}/api/statistics/longest-absent?days=30`);
+      const filtered = (absentRes.data || []).filter(item => item.days_absent >= 5);
+      setLongestAbsent(filtered);
     } catch (err) {
       console.error("Lỗi lấy dữ liệu:", err);
     }
@@ -82,7 +84,7 @@ function Home() {
     return split.map((row, rowIndex) => (
       <tr key={label + rowIndex}>
         {rowIndex === 0 && (
-          <td 
+          <td
             rowSpan={split.length}
             className="font-bold px-2 py-1 text-center align-middle bg-gray-100 border p-1"
           >
@@ -106,7 +108,6 @@ function Home() {
     ));
   };
 
-
   const getList = (str) => (str ? str.split(",") : []);
 
   return (
@@ -120,7 +121,6 @@ function Home() {
           className="border p-1 text-sm"
         />
       </div>
-
 
       {data && (
         <>
@@ -173,6 +173,20 @@ function Home() {
           <span>Chưa có dữ liệu</span>
         )}
       </div>
+
+      {longestAbsent.length > 0 && (
+        <div className="mt-6 text-sm">
+          <p className="font-bold">Các số vắng mặt ≥ 5 ngày:</p>
+          <div className="flex flex-wrap gap-3 mt-1 text-blue-800">
+            {longestAbsent.map((item, idx) => (
+              <span key={idx}>
+                {item.number}
+                <sup className="text-red-500 text-xs ml-0.5">{item.days_absent}</sup>
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
