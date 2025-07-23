@@ -16,6 +16,7 @@ import CauDePage from './CauDePage';
 import GoogleLogin from './GoogleLogin';
 import LogoutPage from './LogoutPage';
 import ServerInfo from './ServerInfo';
+import Logs from './Logs';
 import './index.css';
 
 function App() {
@@ -69,6 +70,7 @@ function App() {
             <li><Link to="/login" onClick={() => setMenuOpen(false)}>🎯 Login Google</Link></li>
             <li><Link to="/logout" onClick={() => setMenuOpen(false)}>🎯 Logout</Link></li>
             <li><Link to="/server-info" onClick={() => setMenuOpen(false)}>🎯 Server Info</Link></li>
+            <li><Link to="/logs" onClick={() => setMenuOpen(false)}>🎯 Logs</Link></li>
           </ul>
         </div>
 
@@ -87,6 +89,7 @@ function App() {
             <Route path="/login" element={<GoogleLogin />} />
             <Route path="/logout" element={<LogoutPage />} />
             <Route path="/server-info" element={<ServerInfo />} />
+            <Route path="/logs" element={<Logs />} />
           </Routes>
         </div>
       </div>

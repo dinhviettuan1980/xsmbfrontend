@@ -122,6 +122,43 @@ function Home() {
         />
       </div>
 
+      {ongPhongResult ? (
+        <div className="mt-4 text-lg font-semibold">
+          <p className="mt-2 text-lg">
+            Cầu Ông Phong:{" "}
+            <span className="font-bold text-green-600">
+              {ongPhongResult.predictions?.join(", ") || "Không có"}
+            </span>
+          </p>
+        </div>
+      ) : (
+        <p>Đang tải dữ liệu cầu ông Phong...</p>
+      )}
+
+      <div className="mt-4 text-lg font-semibold">
+        Cầu Pascal:{" "}
+        {pascalPredictions.length > 0 ? (
+          <span className="text-red-600">
+            {pascalPredictions.join(", ")}
+          </span>
+        ) : (
+          <span>Chưa có dữ liệu</span>
+        )}
+      </div>
+
+      {longestAbsent.length > 0 && (
+        <div className="mt-4 text-sm">
+          <div className="flex flex-wrap gap-3 mt-1 text-blue-800">
+            {longestAbsent.map((item, idx) => (
+              <span key={idx}>
+                {item.number}
+                <sup className="text-red-500 text-xs ml-0.5">{item.days_absent}</sup>
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
       {data && (
         <>
           <div className="overflow-x-auto">
@@ -150,43 +187,6 @@ function Home() {
         </>
       )}
 
-      {ongPhongResult ? (
-        <div className="mt-4 text-lg font-semibold">
-          <p className="mt-2 text-lg">
-            Cầu Ông Phong:{" "}
-            <span className="font-bold text-green-600">
-              {ongPhongResult.predictions?.join(", ") || "Không có"}
-            </span>
-          </p>
-        </div>
-      ) : (
-        <p>Đang tải dữ liệu cầu ông Phong...</p>
-      )}
-
-      <div className="mt-4 text-lg font-semibold">
-        Cầu Pascal:{" "}
-        {pascalPredictions.length > 0 ? (
-          <span className="text-red-600">
-            {pascalPredictions.join(", ")}
-          </span>
-        ) : (
-          <span>Chưa có dữ liệu</span>
-        )}
-      </div>
-
-      {longestAbsent.length > 0 && (
-        <div className="mt-6 text-sm">
-          <p className="font-bold">Các số vắng mặt ≥ 5 ngày:</p>
-          <div className="flex flex-wrap gap-3 mt-1 text-blue-800">
-            {longestAbsent.map((item, idx) => (
-              <span key={idx}>
-                {item.number}
-                <sup className="text-red-500 text-xs ml-0.5">{item.days_absent}</sup>
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
