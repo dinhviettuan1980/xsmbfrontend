@@ -67,13 +67,18 @@ export default function Logs() {
           />
         ) : null}
 
-        <button onClick={() => {
-          if (viewMode === 'logs4') {
-            fetchLogs4();
-          } else {
-            fetchLogs1();
-          }
-        }} className="bg-blue-500 text-white px-4 py-1 rounded">Search</button>
+        <button
+          onClick={() => {
+            if (viewMode === 'logs3' || viewMode === 'logs4') {
+              fetchLogs4();
+            } else {
+              fetchLogs1();
+            }
+          }}
+          className="bg-blue-500 text-white px-4 py-1 rounded"
+        >
+          Search
+        </button>
       </div>
 
       {/* Logs1 - summary */}
@@ -93,6 +98,7 @@ export default function Logs() {
                   className="border px-2 py-1 text-blue-600 cursor-pointer"
                   onClick={() => {
                     setKeyForLog4('');
+                    setSelectedValue(null);
                     fetchLogs2(key);
                   }}
                 >{key}</td>

@@ -29,7 +29,7 @@ function App() {
       try {
         const token = localStorage.getItem('google_id_token');
         if (token) {
-          const res = await apiClient.get('/api/me');
+          const res = await apiClient.get('http://13.55.124.215:8001/api/me');
           setUsername(res.data.name || res.data.email); // tuỳ backend trả về
           setAvatar(res.data.picture);
         }
