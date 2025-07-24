@@ -17,6 +17,7 @@ import GoogleLogin from './GoogleLogin';
 import LogoutPage from './LogoutPage';
 import ServerInfo from './ServerInfo';
 import Logs from './Logs';
+import LogsByDevicePage from './LogsByDevicePage';
 import './index.css';
 
 function App() {
@@ -71,6 +72,7 @@ function App() {
             <li><Link to="/logout" onClick={() => setMenuOpen(false)}>🎯 Logout</Link></li>
             <li><Link to="/server-info" onClick={() => setMenuOpen(false)}>🎯 Server Info</Link></li>
             <li><Link to="/logs" onClick={() => setMenuOpen(false)}>🎯 Logs</Link></li>
+            <li><Link to="/logsbydevice" onClick={() => setMenuOpen(false)}>🎯 Logs by Device</Link></li>
           </ul>
         </div>
 
@@ -90,6 +92,7 @@ function App() {
             <Route path="/logout" element={<LogoutPage />} />
             <Route path="/server-info" element={<ServerInfo />} />
             <Route path="/logs" element={<Logs />} />
+            <Route path="/logsbydevice" element={<LogsByDevicePage />} />
           </Routes>
         </div>
       </div>
