@@ -21,7 +21,7 @@ export default function Logs() {
   }, []);
 
   const fetchLogs1 = async () => {
-    const res = await axios.get(`http://13.55.124.215:8001/logs1?fromdate=${fromDate}`);
+    const res = await axios.get(`http://13.55.124.215:8001/logs11?fromdate=${fromDate}`);
     setLogs1(Object.entries(res.data));
     setViewMode('logs1');
   };

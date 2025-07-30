@@ -67,7 +67,7 @@ function App() {
             <li><Link to="/generate-combinations" onClick={() => setMenuOpen(false)}>🎯 Sinh tổ hợp nhóm</Link></li>
             <li><Link to="/specials" onClick={() => setMenuOpen(false)}>🎯 Giải đặc biệt 2 tháng</Link></li>
             <li><Link to="/cau-lo" onClick={() => setMenuOpen(false)}>🎯 Cầu Lô</Link></li>
-            <li><Link to="/cau-de" onClick={() => setMenuOpen(false)}>🎯 Cầu Đề</Link></li>
+            <li><Link to="/cau-de" onClick={() => setMenuOpen(false)}>🎯 Nhận Dạng</Link></li>
             <li><Link to="/login" onClick={() => setMenuOpen(false)}>🎯 Login Google</Link></li>
             <li><Link to="/logout" onClick={() => setMenuOpen(false)}>🎯 Logout</Link></li>
             <li><Link to="/server-info" onClick={() => setMenuOpen(false)}>🎯 Server Info</Link></li>
