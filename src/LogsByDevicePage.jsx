@@ -12,14 +12,14 @@ export default function LogsByDevice() {
   }, []);
 
   const fetchDevices = async () => {
-    const res = await axios.get(`http://13.55.124.215:8001/logsbydevice?fromdate=${fromDate}`);
+    const res = await axios.get(`http://api.tuandv.id.vn/logsbydevice?fromdate=${fromDate}`);
     setDevices(Object.entries(res.data));
     setSelectedDevice(null);
     setDeviceLogs([]);
   };
 
   const fetchDeviceLogs = async (device) => {
-    const res = await axios.get(`http://13.55.124.215:8001/logsbydevicedetails?value=${device}&fromdate=${fromDate}`);
+    const res = await axios.get(`http://api.tuandv.id.vn/logsbydevicedetails?value=${device}&fromdate=${fromDate}`);
     setDeviceLogs(res.data);
     setSelectedDevice(device);
   };

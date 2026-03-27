@@ -18,6 +18,7 @@ import LogoutPage from './LogoutPage';
 import ServerInfo from './ServerInfo';
 import Logs from './Logs';
 import LogsByDevicePage from './LogsByDevicePage';
+import ChatPage from './ChatPage';
 import './index.css';
 
 function App() {
@@ -30,7 +31,7 @@ function App() {
       try {
         const token = localStorage.getItem('google_id_token');
         if (token) {
-          const res = await apiClient.get('http://13.55.124.215:8001/api/me');
+          const res = await apiClient.get('http://api.tuandv.id.vn/api/me');
           setUsername(res.data.name || res.data.email); // tuỳ backend trả về
           setAvatar(res.data.picture);
         }
@@ -68,6 +69,7 @@ function App() {
             <li><Link to="/specials" onClick={() => setMenuOpen(false)}>🎯 Giải đặc biệt 2 tháng</Link></li>
             <li><Link to="/cau-lo" onClick={() => setMenuOpen(false)}>🎯 Cầu Lô</Link></li>
             <li><Link to="/cau-de" onClick={() => setMenuOpen(false)}>🎯 Nhận Dạng</Link></li>
+            <li><Link to="/chat" onClick={() => setMenuOpen(false)}>🎯 Chat</Link></li>
             <li><Link to="/login" onClick={() => setMenuOpen(false)}>🎯 Login Google</Link></li>
             <li><Link to="/logout" onClick={() => setMenuOpen(false)}>🎯 Logout</Link></li>
             <li><Link to="/server-info" onClick={() => setMenuOpen(false)}>🎯 Server Info</Link></li>
@@ -88,6 +90,7 @@ function App() {
             <Route path="/specials" element={<SpecialsPage />} />
             <Route path="/cau-lo" element={<CauLoPage />} />
             <Route path="/cau-de" element={<CauDePage />} />
+            <Route path="/chat" element={<ChatPage />} />
             <Route path="/login" element={<GoogleLogin />} />
             <Route path="/logout" element={<LogoutPage />} />
             <Route path="/server-info" element={<ServerInfo />} />

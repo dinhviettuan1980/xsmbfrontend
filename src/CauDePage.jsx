@@ -24,7 +24,7 @@ function CauDePage() {
     setNumbers("");
 
     try {
-      const response = await axios.post("http://13.55.124.215:8001/upload", formData, {
+      const response = await axios.post("http://api.tuandv.id.vn/upload", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
