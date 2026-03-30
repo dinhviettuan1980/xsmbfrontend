@@ -16,14 +16,9 @@ apiClient.interceptors.request.use(
     // }
 
     const token = localStorage.getItem('google_id_token');
-
-    // ✅ Nếu không có token, tự redirect
-    if (!token) {
-      window.location.href = '/login'; // dùng window vì không thể gọi navigate ở đây
-      return Promise.reject(new Error('No token'));
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
-
-    config.headers.Authorization = `Bearer ${token}`;
     return config;
   },
   (error) => Promise.reject(error)

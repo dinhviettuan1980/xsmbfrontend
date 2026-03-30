@@ -29,14 +29,11 @@ function App() {
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
-        const token = localStorage.getItem('google_id_token');
-        if (token) {
-          const res = await apiClient.get('http://api.tuandv.id.vn/api/me');
-          setUsername(res.data.name || res.data.email); // tuỳ backend trả về
-          setAvatar(res.data.picture);
-        }
+        const res = await apiClient.get('http://api.tuandv.id.vn/api/me');
+        setUsername(res.data.name || res.data.email);
+        setAvatar(res.data.picture);
       } catch (err) {
-        console.error('Lỗi lấy user info:', err);
+        // không login thì bỏ qua
       }
     };
 
@@ -57,6 +54,9 @@ function App() {
           <span>{username}</span>
         </div>
 
+        {menuOpen && (
+          <div className="menu-overlay" onClick={() => setMenuOpen(false)} />
+        )}
         <div className={`sidebar ${menuOpen ? 'open1' : 'close1'}`}>
           <ul>
             <li><Link to="/" onClick={() => setMenuOpen(false)}>📅 Tra cứu theo ngày</Link></li>
