@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Helmet } from 'react-helmet-async';
 import apiClient from './utils/apiClient';
 
 function CauLoPage() {
@@ -66,6 +67,10 @@ function CauLoPage() {
 
   return (
     <div className="p-4">
+      <Helmet>
+        <title>Cầu Lô - XSMB</title>
+        <meta name="description" content="Dự đoán cầu lô xổ số miền Bắc theo phương pháp Ông Phong và Pascal." />
+      </Helmet>
       {/* Cầu Ông Phong */}
       <h2 className="text-2xl font-bold mb-4">🎯 Cầu Ông Phong</h2>
 

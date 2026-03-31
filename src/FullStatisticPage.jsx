@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import apiClient from './utils/apiClient';
 
@@ -58,6 +59,10 @@ function FullStatisticPage() {
 
   return (
     <div>
+      <Helmet>
+        <title>Thống kê lô tổng quát - XSMB</title>
+        <meta name="description" content="Thống kê tổng quát tần suất lô trong xổ số miền Bắc, biểu đồ trực quan theo số ngày tuỳ chọn." />
+      </Helmet>
       <h2 className="text-lg font-bold mb-4">Thống kê lô trong {days} ngày</h2>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: 20 }}>
         <select value={sortType} onChange={e => setSortType(e.target.value)}>

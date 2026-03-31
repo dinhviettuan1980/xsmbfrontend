@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Helmet } from 'react-helmet-async';
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import apiClient from './utils/apiClient';
 
@@ -13,6 +14,10 @@ function ClassifyPage() {
 
   return (
     <div>
+      <Helmet>
+        <title>Phân loại số 2 chữ số - XSMB</title>
+        <meta name="description" content="Phân loại các số 2 chữ số theo nhóm trong xổ số miền Bắc." />
+      </Helmet>
       <h2 className="text-lg font-bold mb-4">Phân loại số 2 chữ số</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
         {Object.entries(data)

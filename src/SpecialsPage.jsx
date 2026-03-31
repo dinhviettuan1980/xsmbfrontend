@@ -1,5 +1,6 @@
 
 import React, { useEffect, useState } from "react";
+import { Helmet } from 'react-helmet-async';
 import apiClient from './utils/apiClient';
 
 const weekdays = ["Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "CN"];
@@ -45,6 +46,10 @@ function SpecialsPage() {
 
   return (
     <div>
+      <Helmet>
+        <title>Giải đặc biệt 2 tháng - XSMB</title>
+        <meta name="description" content="Thống kê giải đặc biệt xổ số miền Bắc trong 2 tháng gần nhất." />
+      </Helmet>
       <h2 className="text-lg font-bold mb-4">Thống kê giải đặc biệt 2 tháng gần nhất</h2>
       <div className="overflow-x-auto">
         <table className="table-auto border text-[13px]">

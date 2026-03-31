@@ -1,6 +1,7 @@
 
 import React from "react";
 import ReactDOM from "react-dom/client";
+import { HelmetProvider } from 'react-helmet-async';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import "./index.css";
 import App from "./App";
@@ -9,6 +10,10 @@ import App from "./App";
 // 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
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
-root.render(<GoogleOAuthProvider clientId="497702857343-k73ttatervnf5moeuho5i3arnfvlrnjo.apps.googleusercontent.com">
-  <App />
-</GoogleOAuthProvider>);
+root.render(
+  <HelmetProvider>
+    <GoogleOAuthProvider clientId="497702857343-k73ttatervnf5moeuho5i3arnfvlrnjo.apps.googleusercontent.com">
+      <App />
+    </GoogleOAuthProvider>
+  </HelmetProvider>
+);

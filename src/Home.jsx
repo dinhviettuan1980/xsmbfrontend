@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Helmet } from 'react-helmet-async';
 import apiClient from './utils/apiClient';
 
 function HeadTailTable({ headToTail, tailToHead }) {
@@ -112,6 +113,10 @@ function Home() {
 
   return (
     <div>
+      <Helmet>
+        <title>XSMB - Tra cứu kết quả xổ số miền Bắc hôm nay</title>
+        <meta name="description" content="Tra cứu kết quả xổ số miền Bắc (XSMB) hôm nay nhanh nhất, chính xác nhất. Xem kết quả theo ngày, lô đặc biệt, thống kê chi tiết." />
+      </Helmet>
       <div className="flex items-center justify-between mb-4 gap-2">
         <h2 className="text-sm font-bold whitespace-nowrap">Tra cứu kết quả XSMB</h2>
         <input

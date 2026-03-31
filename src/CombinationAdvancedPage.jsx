@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Helmet } from 'react-helmet-async';
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import apiClient from './utils/apiClient';
 
@@ -40,6 +41,10 @@ function CombinationAdvancedPage() {
 
   return (
     <div>
+      <Helmet>
+        <title>Tổ hợp đề 5 số - XSMB</title>
+        <meta name="description" content="Công cụ tạo tổ hợp đề 5 số nâng cao cho xổ số miền Bắc." />
+      </Helmet>
       <h2 className="text-lg font-bold mb-4">Tổ hợp đề 5 số</h2>
       <div className="space-x-2 mb-4">
         <input

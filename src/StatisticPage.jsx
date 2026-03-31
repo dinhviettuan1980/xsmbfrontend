@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import apiClient from './utils/apiClient';
 
 function StatisticPage() {
@@ -71,6 +72,10 @@ function StatisticPage() {
 
   return (
     <div>
+      <Helmet>
+        <title>Thống kê lô theo số - XSMB</title>
+        <meta name="description" content="Thống kê tần suất xuất hiện lô theo từng số trong xổ số miền Bắc (XSMB)." />
+      </Helmet>
       <h2 className="text-lg font-bold mb-4">Thống kê lô theo số</h2>
       <div style={{ display: 'flex', gap: 10, marginBottom: 20 }}>
         <input

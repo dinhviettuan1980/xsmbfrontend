@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Helmet } from 'react-helmet-async';
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import apiClient from './utils/apiClient';
 
@@ -64,6 +65,10 @@ function CombinationGeneratorPage() {
 
   return (
     <div className="p-4">
+      <Helmet>
+        <title>Sinh tổ hợp nhóm - XSMB</title>
+        <meta name="description" content="Công cụ sinh tổ hợp theo nhóm số cho xổ số miền Bắc." />
+      </Helmet>
       <h2 className="text-lg font-bold mb-4">Sinh tổ hợp theo nhóm</h2>
 
       <div className="mb-4">
