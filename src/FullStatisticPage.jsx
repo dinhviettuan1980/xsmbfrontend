@@ -63,7 +63,6 @@ function FullStatisticPage() {
         <title>Thống kê lô tổng quát - XSMB</title>
         <meta name="description" content="Thống kê tổng quát tần suất lô trong xổ số miền Bắc, biểu đồ trực quan theo số ngày tuỳ chọn." />
       </Helmet>
-      <h2 className="text-lg font-bold mb-4">Thống kê lô trong {days} ngày</h2>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: 20 }}>
         <select value={sortType} onChange={e => setSortType(e.target.value)}>
           <option value="frequency">Sắp theo tần suất giảm</option>

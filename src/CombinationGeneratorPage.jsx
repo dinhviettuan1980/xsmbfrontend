@@ -69,7 +69,6 @@ function CombinationGeneratorPage() {
         <title>Sinh tổ hợp nhóm - XSMB</title>
         <meta name="description" content="Công cụ sinh tổ hợp theo nhóm số cho xổ số miền Bắc." />
       </Helmet>
-      <h2 className="text-lg font-bold mb-4">Sinh tổ hợp theo nhóm</h2>
 
       <div className="mb-4">
         <label className="block mb-2 font-semibold">Chọn nhóm:</label>

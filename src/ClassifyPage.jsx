@@ -18,7 +18,6 @@ function ClassifyPage() {
         <title>Phân loại số 2 chữ số - XSMB</title>
         <meta name="description" content="Phân loại các số 2 chữ số theo nhóm trong xổ số miền Bắc." />
       </Helmet>
-      <h2 className="text-lg font-bold mb-4">Phân loại số 2 chữ số</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
         {Object.entries(data)
           .filter(([key]) => !key.endsWith("_missing")) // chỉ hiển thị nhóm chính, không hiển thị missing riêng lẻ

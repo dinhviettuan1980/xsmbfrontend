@@ -50,7 +50,6 @@ function SpecialsPage() {
         <title>Giải đặc biệt 2 tháng - XSMB</title>
         <meta name="description" content="Thống kê giải đặc biệt xổ số miền Bắc trong 2 tháng gần nhất." />
       </Helmet>
-      <h2 className="text-lg font-bold mb-4">Thống kê giải đặc biệt 2 tháng gần nhất</h2>
       <div className="overflow-x-auto">
         <table className="table-auto border text-[13px]">
           <thead>

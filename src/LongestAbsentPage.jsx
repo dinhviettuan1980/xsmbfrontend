@@ -30,7 +30,6 @@ function LongestAbsentPage() {
         <title>Số lâu chưa xuất hiện - XSMB</title>
         <meta name="description" content="Tra cứu những con số lâu chưa xuất hiện trong xổ số miền Bắc theo số ngày tuỳ chọn." />
       </Helmet>
-      <h2 className="text-lg font-bold mb-4">Những số lâu chưa xuất hiện trong {days} ngày</h2>
       <div style={{ display: 'flex', gap: 10, marginBottom: 20 }}>
         <button onClick={fetchData} className="bg-blue-500 text-white px-3 py-1 rounded">Lấy danh sách</button>
         <input

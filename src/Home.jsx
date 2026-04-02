@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Helmet } from 'react-helmet-async';
+import { useHeaderSlot } from './HeaderSlotContext';
 import apiClient from './utils/apiClient';
 
 function HeadTailTable({ headToTail, tailToHead }) {
@@ -38,6 +39,7 @@ function Home() {
   const [ongPhongResult, setOngPhongResult] = useState(null);
   const [pascalPredictions, setPascalPredictions] = useState([]);
   const [longestAbsent, setLongestAbsent] = useState([]);
+  const { setSlot } = useHeaderSlot();
 
   const getYesterday = () => {
     const d = new Date();
@@ -50,6 +52,18 @@ function Home() {
     setDate(yesterday);
     fetchData(yesterday);
   }, []);
+
+  useEffect(() => {
+    setSlot(
+      <input
+        type="date"
+        value={date}
+        onChange={(e) => setDate(e.target.value)}
+        className="border p-1 text-sm"
+      />
+    );
+    return () => setSlot(null);
+  }, [date]);
 
   useEffect(() => {
     if (date) fetchData(date);
@@ -117,38 +131,28 @@ function Home() {
         <title>XSMB - Tra cứu kết quả xổ số miền Bắc hôm nay</title>
         <meta name="description" content="Tra cứu kết quả xổ số miền Bắc (XSMB) hôm nay nhanh nhất, chính xác nhất. Xem kết quả theo ngày, lô đặc biệt, thống kê chi tiết." />
       </Helmet>
-      <div className="flex items-center justify-between mb-4 gap-2">
-        <h2 className="text-sm font-bold whitespace-nowrap">Tra cứu kết quả XSMB</h2>
-        <input
-          type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          className="border p-1 text-sm"
-        />
-      </div>
 
-      {ongPhongResult ? (
-        <div className="mt-4 text-lg font-semibold">
-          <p className="mt-2 text-lg">
-            Cầu Ông Phong:{" "}
+      <div className="mt-4 grid grid-cols-2 gap-4 text-sm font-semibold">
+        <div>
+          Cầu Ông Phong:{" "}
+          {ongPhongResult ? (
             <span className="font-bold text-green-600">
               {ongPhongResult.predictions?.join(", ") || "Không có"}
             </span>
-          </p>
+          ) : (
+            <span className="text-gray-400 text-sm">Đang tải...</span>
+          )}
         </div>
-      ) : (
-        <p>Đang tải dữ liệu cầu ông Phong...</p>
-      )}
-
-      <div className="mt-4 text-lg font-semibold">
-        Cầu Pascal:{" "}
-        {pascalPredictions.length > 0 ? (
-          <span className="text-red-600">
-            {pascalPredictions.join(", ")}
-          </span>
-        ) : (
-          <span>Chưa có dữ liệu</span>
-        )}
+        <div>
+          Cầu Pascal:{" "}
+          {pascalPredictions.length > 0 ? (
+            <span className="text-red-600">
+              {pascalPredictions.join(", ")}
+            </span>
+          ) : (
+            <span className="text-gray-400 text-sm">Chưa có dữ liệu</span>
+          )}
+        </div>
       </div>
 
       {longestAbsent.length > 0 && (

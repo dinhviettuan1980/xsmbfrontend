@@ -44,7 +44,6 @@ function CauDePage() {
         <title>Nhận Dạng số - XSMB</title>
         <meta name="description" content="Công cụ nhận dạng và phân tích số trong xổ số miền Bắc." />
       </Helmet>
-      <h2 className="text-xl font-bold mb-4">🎯 Nhận Dạng</h2>
 
       <div className="flex gap-2 mb-4">
         <button
