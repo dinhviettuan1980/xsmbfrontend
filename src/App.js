@@ -1,9 +1,7 @@
 // src/App.js
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { HeaderSlotProvider, useHeaderSlot } from './HeaderSlotContext';
-import apiClient from './utils/apiClient';
-import { isTokenExpired } from './utils/tokenUtil';
 import Home from './Home';
 import StatisticPage from './StatisticPage';
 import FullStatisticPage from './FullStatisticPage';
@@ -14,8 +12,6 @@ import SpecialsPage from './SpecialsPage';
 import CombinationGeneratorPage from './CombinationGeneratorPage';
 import CauLoPage from './CauLoPage';
 import CauDePage from './CauDePage';
-import GoogleLogin from './GoogleLogin';
-import LogoutPage from './LogoutPage';
 import ServerInfo from './ServerInfo';
 import Logs from './Logs';
 import LogsByDevicePage from './LogsByDevicePage';
@@ -39,8 +35,6 @@ const PAGE_TITLES = {
   '/cau-lo': 'Cầu Lô',
   '/cau-de': 'Nhận Dạng',
   '/chat': 'Chat',
-  '/login': 'Login Google',
-  '/logout': 'Logout',
   '/server-info': 'Server Info',
   '/logs': 'Logs',
   '/logsbydevice': 'Logs by Device',
@@ -48,24 +42,8 @@ const PAGE_TITLES = {
 
 function AppLayout() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [username, setUsername] = useState('');
-  const [avatar, setAvatar] = useState('');
   const location = useLocation();
   const pageTitle = PAGE_TITLES[location.pathname] || 'XSMB';
-
-  useEffect(() => {
-    const fetchUserInfo = async () => {
-      try {
-        const res = await apiClient.get('/api/me');
-        setUsername(res.data.name || res.data.email);
-        setAvatar(res.data.picture);
-      } catch (err) {
-        // không login thì bỏ qua
-      }
-    };
-
-    fetchUserInfo();
-  }, []);
 
   return (
     <div className="app-container text-base">
@@ -75,12 +53,6 @@ function AppLayout() {
         </button>
         <h1 className="text-lg font-bold">{pageTitle}</h1>
         <HeaderSlot />
-        {avatar && (
-          <div className="ml-auto inline-flex items-center gap-2">
-            <img src={avatar} alt="avatar" className="w-8 h-8 rounded-full" />
-            <span>{username}</span>
-          </div>
-        )}
       </div>
 
       {menuOpen && (
@@ -99,8 +71,6 @@ function AppLayout() {
           <li><Link to="/cau-lo" onClick={() => setMenuOpen(false)}>🎯 Cầu Lô</Link></li>
           <li><Link to="/cau-de" onClick={() => setMenuOpen(false)}>🎯 Nhận Dạng</Link></li>
           <li><Link to="/chat" onClick={() => setMenuOpen(false)}>🎯 Chat</Link></li>
-          <li><Link to="/login" onClick={() => setMenuOpen(false)}>🎯 Login Google</Link></li>
-          <li><Link to="/logout" onClick={() => setMenuOpen(false)}>🎯 Logout</Link></li>
           <li><Link to="/server-info" onClick={() => setMenuOpen(false)}>🎯 Server Info</Link></li>
           <li><Link to="/logs" onClick={() => setMenuOpen(false)}>🎯 Logs</Link></li>
           <li><Link to="/logsbydevice" onClick={() => setMenuOpen(false)}>🎯 Logs by Device</Link></li>
@@ -120,8 +90,6 @@ function AppLayout() {
           <Route path="/cau-lo" element={<CauLoPage />} />
           <Route path="/cau-de" element={<CauDePage />} />
           <Route path="/chat" element={<ChatPage />} />
-          <Route path="/login" element={<GoogleLogin />} />
-          <Route path="/logout" element={<LogoutPage />} />
           <Route path="/server-info" element={<ServerInfo />} />
           <Route path="/logs" element={<Logs />} />
           <Route path="/logsbydevice" element={<LogsByDevicePage />} />
