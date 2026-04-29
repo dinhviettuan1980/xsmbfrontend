@@ -25,6 +25,10 @@
   transform: translateX(-100%);
 }
 
+.menu-toggle {
+  line-height: normal;
+}
+
 .menu-overlay {
   position: fixed;
   inset: 0;
