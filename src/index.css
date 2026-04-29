@@ -53,7 +53,7 @@ html {
 }
 
 .marquee-track img {
-  height: 16px;
+  height: 32px;
   width: auto;
   display: inline-block;
 }
