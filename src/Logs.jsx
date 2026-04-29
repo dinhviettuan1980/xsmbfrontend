@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import apiClient from './utils/apiClient';
 
 const PAGE_SIZE = 100;
 
@@ -21,13 +21,13 @@ export default function Logs() {
   }, []);
 
   const fetchLogs1 = async () => {
-    const res = await axios.get(`http://api.tuandv.id.vn/logs11?fromdate=${fromDate}`);
+    const res = await apiClient.get(`${process.env.REACT_APP_API_BASE}/logs11?fromdate=${fromDate}`);
     setLogs1(Object.entries(res.data));
     setViewMode('logs1');
   };
 
   const fetchLogs2 = async (key, pageNumber = 1) => {
-    const res = await axios.get(`http://api.tuandv.id.vn/logs2?key=${key}&fromdate=${fromDate}&page=${pageNumber}&size=${PAGE_SIZE}`);
+    const res = await apiClient.get(`${process.env.REACT_APP_API_BASE}/logs2?key=${key}&fromdate=${fromDate}&page=${pageNumber}&size=${PAGE_SIZE}`);
     setLogs2(res.data);
     setSelectedKey(key);
     setPage(pageNumber);
@@ -35,14 +35,14 @@ export default function Logs() {
   };
 
   const fetchLogs3 = async (value) => {
-    const res = await axios.get(`http://api.tuandv.id.vn/logs3?value=${value}&fromdate=${fromDate}&page=1&size=${PAGE_SIZE}`);
+    const res = await apiClient.get(`${process.env.REACT_APP_API_BASE}/logs3?value=${value}&fromdate=${fromDate}&page=1&size=${PAGE_SIZE}`);
     setLogs3(res.data);
     setSelectedValue(value);
     setViewMode('logs3');
   };
 
   const fetchLogs4 = async () => {
-    const res = await axios.get(`http://api.tuandv.id.vn/logs4?key=${keyForLog4}&value=${selectedValue}&fromdate=${fromDate}`);
+    const res = await apiClient.get(`${process.env.REACT_APP_API_BASE}/logs4?key=${keyForLog4}&value=${selectedValue}&fromdate=${fromDate}`);
     setLogs4(res.data);
     setViewMode('logs4');
   };

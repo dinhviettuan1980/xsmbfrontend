@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
 import { Helmet } from 'react-helmet-async';
-import axios from "axios";
+import apiClient from './utils/apiClient';
 
 function CauDePage() {
   const [numbers, setNumbers] = useState("");
@@ -25,7 +25,7 @@ function CauDePage() {
     setNumbers("");
 
     try {
-      const response = await axios.post("http://api.tuandv.id.vn/upload", formData, {
+      const response = await apiClient.post(`${process.env.REACT_APP_API_BASE}/upload`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 

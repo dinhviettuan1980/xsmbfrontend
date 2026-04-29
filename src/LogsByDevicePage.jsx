@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import apiClient from './utils/apiClient';
 
 export default function LogsByDevice() {
   const [fromDate, setFromDate] = useState(() => new Date().toISOString().split('T')[0]);
@@ -12,14 +12,14 @@ export default function LogsByDevice() {
   }, []);
 
   const fetchDevices = async () => {
-    const res = await axios.get(`http://api.tuandv.id.vn/logsbydevice?fromdate=${fromDate}`);
+    const res = await apiClient.get(`${process.env.REACT_APP_API_BASE}/logsbydevice?fromdate=${fromDate}`);
     setDevices(Object.entries(res.data));
     setSelectedDevice(null);
     setDeviceLogs([]);
   };
 
   const fetchDeviceLogs = async (device) => {
-    const res = await axios.get(`http://api.tuandv.id.vn/logsbydevicedetails?value=${device}&fromdate=${fromDate}`);
+    const res = await apiClient.get(`${process.env.REACT_APP_API_BASE}/logsbydevicedetails?value=${device}&fromdate=${fromDate}`);
     setDeviceLogs(res.data);
     setSelectedDevice(device);
   };

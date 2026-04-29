@@ -56,7 +56,7 @@ function AppLayout() {
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
-        const res = await apiClient.get('http://api.tuandv.id.vn/api/me');
+        const res = await apiClient.get('/api/me');
         setUsername(res.data.name || res.data.email);
         setAvatar(res.data.picture);
       } catch (err) {
