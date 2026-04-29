@@ -48,7 +48,7 @@ function AppLayout() {
       <div className="marquee-wrapper">
         <div className="marquee-track">
           {[...Array(20)].map((_, i) => (
-            <img key={i} src="/co.jpg" alt="" />
+            <img key={i} src="/co1.jpg" alt="" />
           ))}
         </div>
       </div>
