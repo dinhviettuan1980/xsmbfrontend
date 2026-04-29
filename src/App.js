@@ -53,7 +53,7 @@ function AppLayout() {
         </div>
       </div>
       <div className="flex items-center gap-3 px-2 pb-1">
-        <button className="menu-toggle text-6xl" onClick={() => setMenuOpen(!menuOpen)}>
+        <button className="menu-toggle" onClick={() => setMenuOpen(!menuOpen)}>
           ☰
         </button>
         <h1 className="text-lg font-bold">{pageTitle}</h1>
