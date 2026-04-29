@@ -45,6 +45,13 @@ function AppLayout() {
 
   return (
     <div className="app-container text-base">
+      <div className="marquee-wrapper">
+        <div className="marquee-track">
+          {[...Array(20)].map((_, i) => (
+            <img key={i} src="/co.jpg" alt="" />
+          ))}
+        </div>
+      </div>
       <div className="flex items-center gap-3 p-2">
         <button className="menu-toggle text-6xl" onClick={() => setMenuOpen(!menuOpen)}>
           ☰
