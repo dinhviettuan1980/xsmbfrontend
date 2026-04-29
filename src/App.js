@@ -11,7 +11,6 @@ import ClassifyPage from './ClassifyPage';
 import SpecialsPage from './SpecialsPage';
 import CombinationGeneratorPage from './CombinationGeneratorPage';
 import CauLoPage from './CauLoPage';
-import CauDePage from './CauDePage';
 import ServerInfo from './ServerInfo';
 import Logs from './Logs';
 import LogsByDevicePage from './LogsByDevicePage';
@@ -33,7 +32,6 @@ const PAGE_TITLES = {
   '/generate-combinations': 'Sinh tổ hợp nhóm',
   '/specials': 'Giải đặc biệt 2 tháng',
   '/cau-lo': 'Cầu Lô',
-  '/cau-de': 'Nhận Dạng',
   '/chat': 'Chat',
   '/server-info': 'Server Info',
   '/logs': 'Logs',
@@ -69,7 +67,6 @@ function AppLayout() {
           <li><Link to="/generate-combinations" onClick={() => setMenuOpen(false)}>🎯 Sinh tổ hợp nhóm</Link></li>
           <li><Link to="/specials" onClick={() => setMenuOpen(false)}>🎯 Giải đặc biệt 2 tháng</Link></li>
           <li><Link to="/cau-lo" onClick={() => setMenuOpen(false)}>🎯 Cầu Lô</Link></li>
-          <li><Link to="/cau-de" onClick={() => setMenuOpen(false)}>🎯 Nhận Dạng</Link></li>
           <li><Link to="/chat" onClick={() => setMenuOpen(false)}>🎯 Chat</Link></li>
           <li><Link to="/server-info" onClick={() => setMenuOpen(false)}>🎯 Server Info</Link></li>
           <li><Link to="/logs" onClick={() => setMenuOpen(false)}>🎯 Logs</Link></li>
@@ -88,7 +85,6 @@ function AppLayout() {
           <Route path="/generate-combinations" element={<CombinationGeneratorPage />} />
           <Route path="/specials" element={<SpecialsPage />} />
           <Route path="/cau-lo" element={<CauLoPage />} />
-          <Route path="/cau-de" element={<CauDePage />} />
           <Route path="/chat" element={<ChatPage />} />
           <Route path="/server-info" element={<ServerInfo />} />
           <Route path="/logs" element={<Logs />} />
