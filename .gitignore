@@ -4,3 +4,5 @@ build/
 .claude/tuandinhviet778.pem
 *.env
 .env
+tuandinhviet778.pem
+.claude/
