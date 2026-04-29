@@ -52,7 +52,7 @@ function AppLayout() {
           ))}
         </div>
       </div>
-      <div className="flex items-center gap-3 p-2">
+      <div className="flex items-center gap-3 px-2 pb-1">
         <button className="menu-toggle text-6xl" onClick={() => setMenuOpen(!menuOpen)}>
           ☰
         </button>
