@@ -41,6 +41,7 @@ function Home() {
   const [ongPhongResult, setOngPhongResult] = useState(null);
   const [pascalPredictions, setPascalPredictions] = useState([]);
   const [longestAbsent, setLongestAbsent] = useState([]);
+  const [ganThreshold, setGanThreshold] = useState(10);
   const { setSlot } = useHeaderSlot();
 
   const getYesterday = () => {
@@ -85,9 +86,8 @@ function Home() {
       const res = await apiClient.get(`/api/history?date=${targetDate}`);
       setData(res.data);
 
-      const absentRes = await apiClient.get(`${baseUrl}/api/statistics/longest-absent?days=30`);
-      const filtered = (absentRes.data || []).filter(item => item.days_absent >= 5);
-      setLongestAbsent(filtered);
+      const absentRes = await apiClient.get(`${baseUrl}/api/statistics/longest-absent?days=60`);
+      setLongestAbsent(absentRes.data || []);
     } catch (err) {
       console.error("Lỗi lấy dữ liệu:", err);
     }
@@ -108,7 +108,7 @@ function Home() {
           </td>
         )}
         <td colSpan="6" className="py-1.5 px-2">
-          <div className="flex justify-start gap-1.5 flex-wrap">
+          <div className="flex justify-center gap-1.5 flex-wrap">
             {row.map((num, idx) => (
               <div
                 key={idx}
@@ -157,29 +157,41 @@ function Home() {
         </div>
       </div>
 
-      {/* Absent numbers badges */}
-      {longestAbsent.length > 0 && (
-        <div className="mb-3">
-          <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1.5">Số lâu vắng (≥5 ngày)</div>
-          <div className="flex flex-wrap gap-1.5">
-            {longestAbsent.map((item, idx) => (
-              <span
-                key={idx}
-                className="inline-flex items-baseline gap-0.5 bg-blue-50 border border-blue-200 text-blue-800 rounded-full px-2 py-0.5 text-sm font-semibold"
-              >
-                {item.number}
-                <sup className="text-red-500 text-xs font-bold">{item.days_absent}</sup>
-              </span>
+      {/* Lô Gan */}
+      <div className="mb-3">
+        <div className="flex items-center gap-2 mb-1.5">
+          <div className="text-xs font-bold text-gray-600 uppercase tracking-wide">LÔ Gan ≥</div>
+          <select
+            value={ganThreshold}
+            onChange={e => setGanThreshold(Number(e.target.value))}
+            className="border border-gray-200 rounded-lg px-2 py-0.5 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-red-500 bg-white text-gray-700"
+          >
+            {[5, 7, 10, 14, 20, 25, 30].map(v => (
+              <option key={v} value={v}>{v} ngày</option>
             ))}
-          </div>
+          </select>
         </div>
-      )}
+        <div className="flex flex-wrap gap-1.5">
+          {longestAbsent.filter(item => item.days_absent >= ganThreshold).map((item, idx) => (
+            <span
+              key={idx}
+              className="inline-flex items-baseline gap-0.5 bg-blue-50 border border-blue-200 text-blue-800 rounded-full px-2 py-0.5 text-sm font-semibold"
+            >
+              {item.number}
+              <sup className="text-red-500 text-xs font-bold">{item.days_absent}</sup>
+            </span>
+          ))}
+          {longestAbsent.filter(item => item.days_absent >= ganThreshold).length === 0 && (
+            <span className="text-xs text-gray-400">Không có số nào vắng ≥ {ganThreshold} ngày</span>
+          )}
+        </div>
+      </div>
 
       {/* Lottery results table */}
       {data && (
         <>
           <div className="overflow-x-auto rounded-xl border border-gray-200 shadow-sm">
-            <table className="table-auto text-sm w-full max-w-lg bg-white border-collapse">
+            <table className="table-auto text-sm w-full bg-white border-collapse mx-auto">
               <tbody>
                 {/* Special prize */}
                 <tr className="border-b border-gray-100">
