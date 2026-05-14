@@ -90,7 +90,7 @@ function Home() {
     if (!isLive) return;
     const t = setInterval(() => {
       if (dateRef.current && !hasG0Ref.current) fetchData(dateRef.current);
-    }, 30000);
+    }, 5000);
     return () => clearInterval(t);
   }, [isLive]);
 
@@ -236,7 +236,7 @@ function Home() {
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75" />
             <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-600" />
           </span>
-          <span className="text-xs font-semibold text-red-700">Đang quay số – tự động cập nhật mỗi 30 giây</span>
+          <span className="text-xs font-semibold text-red-700">Đang quay số – tự động cập nhật mỗi 5 giây</span>
         </div>
       )}
 
