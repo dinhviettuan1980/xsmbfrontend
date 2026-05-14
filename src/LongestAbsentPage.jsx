@@ -81,7 +81,7 @@ function LongestAbsentPage() {
                             ? 'bg-amber-100 text-amber-700'
                             : 'bg-blue-50 text-blue-600'
                       }`}>
-                        {days_absent} ngày
+                        {days_absent}
                       </span>
                     </td>
                     <td className="px-4 py-2.5 text-center">
@@ -92,7 +92,7 @@ function LongestAbsentPage() {
                               : maxAbsent >= 30
                                 ? 'bg-orange-100 text-orange-700'
                                 : 'bg-gray-100 text-gray-600'
-                          }`}>{maxAbsent} ngày</span>
+                          }`}>{maxAbsent}</span>
                         : <span className="text-gray-300 text-xs">—</span>}
                     </td>
                   </tr>

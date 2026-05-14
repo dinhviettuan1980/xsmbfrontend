@@ -98,7 +98,7 @@ function MaxAbsentStatsPage() {
                             ? 'bg-amber-100 text-amber-700'
                             : 'bg-blue-50 text-blue-600'
                     }`}>
-                      {max_days_absent} ngày
+                      {max_days_absent}
                     </span>
                   </td>
                 </tr>

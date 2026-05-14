@@ -89,7 +89,7 @@ export default function AvgCyclePage() {
                   <td className="px-4 py-2.5 text-center font-bold text-gray-800">{number}</td>
                   <td className="px-4 py-2.5 text-center">
                     <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-bold ${cycleColor(avg_cycle)}`}>
-                      {avg_cycle !== null ? `${avg_cycle} ngày` : '—'}
+                      {avg_cycle !== null ? avg_cycle : '—'}
                     </span>
                   </td>
                   <td className="px-4 py-2.5 text-center text-gray-600">{appearances}</td>
