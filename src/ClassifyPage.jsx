@@ -18,31 +18,33 @@ function ClassifyPage() {
         <title>Phân loại số 2 chữ số - XSMB</title>
         <meta name="description" content="Phân loại các số 2 chữ số theo nhóm trong xổ số miền Bắc." />
       </Helmet>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
         {Object.entries(data)
-          .filter(([key]) => !key.endsWith("_missing")) // chỉ hiển thị nhóm chính, không hiển thị missing riêng lẻ
+          .filter(([key]) => !key.endsWith("_missing"))
           .map(([key, values]) => {
             const joined = values.join(", ");
-            const missingKey = `${key}_missing`;
-            const missingDays = data[missingKey];
-
+            const missingDays = data[`${key}_missing`];
             return (
-              <div key={key} className="border rounded p-2">
-                <div className="font-semibold mb-1">
-                  {key}
+              <div key={key} className="bg-white border border-gray-200 rounded-xl p-3 shadow-sm">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-semibold text-gray-700">{key}</span>
                   {missingDays !== undefined && (
-                    <span className="text-red-500 text-xs ml-2">({missingDays} ngày)</span>
+                    <span className="bg-red-50 text-red-600 border border-red-100 text-xs font-semibold px-2 py-0.5 rounded-full">
+                      {missingDays} ngày
+                    </span>
                   )}
                 </div>
-                <div className="mb-1 break-words">{joined}</div>
-                <CopyToClipboard text={joined} onCopy={() => setCopiedKey(key)}>
-                  <button className="bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded text-xs">
-                    📋 Copy
-                  </button>
-                </CopyToClipboard>
-                {copiedKey === key && (
-                  <span className="text-green-600 ml-2 text-xs">Đã sao chép!</span>
-                )}
+                <div className="text-gray-500 break-words mb-2 text-xs leading-relaxed">{joined}</div>
+                <div className="flex items-center gap-2">
+                  <CopyToClipboard text={joined} onCopy={() => setCopiedKey(key)}>
+                    <button className="bg-gray-100 hover:bg-gray-200 text-gray-600 px-3 py-1 rounded-lg text-xs font-medium transition-colors">
+                      📋 Copy
+                    </button>
+                  </CopyToClipboard>
+                  {copiedKey === key && (
+                    <span className="text-green-600 text-xs font-medium">Đã sao chép!</span>
+                  )}
+                </div>
               </div>
             );
           })}

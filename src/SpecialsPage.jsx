@@ -1,9 +1,13 @@
-
 import React, { useEffect, useState } from "react";
 import { Helmet } from 'react-helmet-async';
 import apiClient from './utils/apiClient';
 
 const weekdays = ["Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "CN"];
+
+const formatShortDate = (dateStr) => {
+  const d = new Date(dateStr);
+  return `${d.getDate()}/${d.getMonth() + 1}`;
+};
 
 function SpecialsPage() {
   const [grouped, setGrouped] = useState([]);
@@ -12,7 +16,6 @@ function SpecialsPage() {
     const baseUrl = process.env.REACT_APP_API_BASE;
     apiClient.get(`${baseUrl}/api/specials/recent`).then(res => {
       const data = res.data;
-
       if (!data.length) return;
 
       const dateMap = new Map();
@@ -29,7 +32,6 @@ function SpecialsPage() {
 
       const weeks = [];
       let current = new Date(startDate);
-
       while (current <= maxDate) {
         const week = [];
         for (let i = 0; i < 7; i++) {
@@ -39,7 +41,6 @@ function SpecialsPage() {
         }
         weeks.push(week);
       }
-
       setGrouped(weeks);
     });
   }, []);
@@ -50,28 +51,45 @@ function SpecialsPage() {
         <title>Giải đặc biệt 2 tháng - XSMB</title>
         <meta name="description" content="Thống kê giải đặc biệt xổ số miền Bắc trong 2 tháng gần nhất." />
       </Helmet>
-      <div className="overflow-x-auto">
-        <table className="table-auto border text-[13px]">
+      <div className="overflow-x-auto rounded-xl border border-gray-200 shadow-sm">
+        <table className="table-auto border-collapse bg-white text-sm w-full">
           <thead>
-            <tr className="bg-yellow-100 text-center">
-              {weekdays.map(day => (
-                <th key={day} className="border px-1.5 py-1 whitespace-nowrap">{day}</th>
+            <tr>
+              {weekdays.map((day, idx) => (
+                <th
+                  key={day}
+                  className={`px-2 py-2 text-center font-semibold text-xs whitespace-nowrap border-b border-gray-200 ${
+                    idx === 6
+                      ? 'bg-red-700 text-white'
+                      : 'bg-red-700 text-white'
+                  }`}
+                >
+                  {day}
+                </th>
               ))}
             </tr>
           </thead>
           <tbody>
             {grouped.map((week, i) => (
-              <tr key={i}>
+              <tr key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                 {week.map((item, j) => (
-                  <td key={j} className="border px-1.5 py-0.5 text-center align-top">
+                  <td
+                    key={j}
+                    className={`border border-gray-100 px-1.5 py-1 text-center align-top min-w-[48px] ${
+                      j === 6 ? 'bg-red-50' : ''
+                    }`}
+                  >
                     {item ? (
-                      <div className="leading-snug">
+                      <div className="leading-tight">
                         <div className="font-bold tracking-wide">
-                          <span>{item.number.slice(0, 3)}</span>
+                          <span className="text-gray-700">{item.number.slice(0, 3)}</span>
                           <span className="text-red-600">{item.number.slice(3)}</span>
                         </div>
+                        <div className="text-gray-400 text-[10px] mt-0.5">{formatShortDate(item.date)}</div>
                       </div>
-                    ) : <div className="text-gray-300">—</div>}
+                    ) : (
+                      <div className="text-gray-200">—</div>
+                    )}
                   </td>
                 ))}
               </tr>

@@ -6,10 +6,9 @@ function LongestAbsentPage() {
   const [days, setDays] = useState(30);
   const [result, setResult] = useState([]);
 
-  // 👇 Tự động fetch khi load trang
   useEffect(() => {
     fetchData();
-  }, [days]); // Có thể chỉ dùng [] nếu không muốn tự load khi days thay đổi
+  }, [days]);
 
   const fetchData = async () => {
     try {
@@ -28,38 +27,60 @@ function LongestAbsentPage() {
     <div>
       <Helmet>
         <title>Số lâu chưa xuất hiện - XSMB</title>
-        <meta name="description" content="Tra cứu những con số lâu chưa xuất hiện trong xổ số miền Bắc theo số ngày tuỳ chọn." />
+        <meta name="description" content="Tra cứu những con số lâu chưa xuất hiện trong xổ số miền Bắc." />
       </Helmet>
-      <div style={{ display: 'flex', gap: 10, marginBottom: 20 }}>
-        <button onClick={fetchData} className="bg-blue-500 text-white px-3 py-1 rounded">Lấy danh sách</button>
+
+      <div className="flex flex-wrap items-center gap-2 mb-4">
         <input
           type="number"
           value={days}
           onChange={e => setDays(e.target.value)}
-          style={{ width: 30 }}
+          className="w-16 border border-gray-200 rounded-lg px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 text-center bg-white"
         />
-        ngày
+        <span className="text-sm text-gray-500">ngày</span>
+        <button
+          onClick={fetchData}
+          className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
+        >
+          Lấy danh sách
+        </button>
       </div>
 
       {result.length > 0 && (
-        <table border="1" cellPadding="6" cellSpacing="0" style={{ width: '100%' }}>
-          <thead>
-            <tr>
-              <th>Số</th>
-              <th>Ngày xuất hiện gần nhất</th>
-              <th>Số ngày vắng mặt</th>
-            </tr>
-          </thead>
-          <tbody>
-            {result.map(({ number, last_seen, days_absent }) => (
-              <tr key={number}>
-                <td>{number}</td>
-                <td>{last_seen ? new Date(last_seen).toLocaleDateString('vi-VN') : 'Chưa xuất hiện'}</td>
-                <td>{days_absent}</td>
+        <div className="overflow-x-auto rounded-xl border border-gray-200 shadow-sm">
+          <table className="w-full text-sm border-collapse bg-white">
+            <thead>
+              <tr className="bg-red-700 text-white">
+                <th className="px-4 py-2 text-center font-semibold">Số</th>
+                <th className="px-4 py-2 text-center font-semibold">Xuất hiện gần nhất</th>
+                <th className="px-4 py-2 text-center font-semibold">Ngày vắng</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {result.map(({ number, last_seen, days_absent }, idx) => (
+                <tr key={number} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                  <td className="px-4 py-2.5 text-center font-bold text-gray-800">{number}</td>
+                  <td className="px-4 py-2.5 text-center text-gray-500">
+                    {last_seen
+                      ? new Date(last_seen).toLocaleDateString('vi-VN')
+                      : <span className="text-gray-300">Chưa xuất hiện</span>}
+                  </td>
+                  <td className="px-4 py-2.5 text-center">
+                    <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-bold ${
+                      days_absent >= 20
+                        ? 'bg-red-100 text-red-700'
+                        : days_absent >= 10
+                          ? 'bg-amber-100 text-amber-700'
+                          : 'bg-blue-50 text-blue-600'
+                    }`}>
+                      {days_absent} ngày
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );

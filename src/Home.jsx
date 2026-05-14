@@ -5,27 +5,29 @@ import apiClient from './utils/apiClient';
 
 function HeadTailTable({ headToTail, tailToHead }) {
   const renderTable = (map, label1, label2) => (
-    <table className="table-auto w-full text-sm border-collapse border">
-      <thead className="bg-blue-100 text-center">
-        <tr>
-          <th className="border p-1">{label1}</th>
-          <th className="border p-1">{label2}</th>
-        </tr>
-      </thead>
-      <tbody>
-        {Object.entries(map).map(([k, v]) => (
-          <tr key={label1 + k} className="text-center even:bg-blue-50">
-            <td className="text-red-600 font-medium border p-1">{k}</td>
-            <td className="border p-1">{v}</td>
+    <div className="overflow-hidden rounded-xl border border-gray-200 shadow-sm">
+      <table className="table-auto w-full text-sm border-collapse">
+        <thead>
+          <tr className="bg-red-700 text-white">
+            <th className="px-3 py-2 text-center font-semibold">{label1}</th>
+            <th className="px-3 py-2 text-center font-semibold">{label2}</th>
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {Object.entries(map).map(([k, v], idx) => (
+            <tr key={label1 + k} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+              <td className="text-red-600 font-bold px-3 py-1.5 text-center border-b border-gray-100">{k}</td>
+              <td className="px-3 py-1.5 text-center border-b border-gray-100 text-gray-700">{v}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 
   return (
-    <div className="mt-6">
-      <div className="grid grid-cols-2 gap-6">
+    <div className="mt-4">
+      <div className="grid grid-cols-2 gap-3">
         {renderTable(headToTail, "Đầu", "Đuôi")}
         {renderTable(tailToHead, "Đuôi", "Đầu")}
       </div>
@@ -59,7 +61,7 @@ function Home() {
         type="date"
         value={date}
         onChange={(e) => setDate(e.target.value)}
-        className="border p-1 text-sm"
+        className="bg-white text-red-700 rounded-lg px-2 py-1 text-sm font-semibold focus:outline-none border-0 cursor-pointer"
       />
     );
     return () => setSlot(null);
@@ -72,7 +74,6 @@ function Home() {
   const fetchData = async (targetDate) => {
     try {
       const baseUrl = process.env.REACT_APP_API_BASE;
-
       if (!targetDate) return;
 
       const phongRes = await apiClient.get(`${baseUrl}/api/cau-ong-phong`);
@@ -95,26 +96,26 @@ function Home() {
   const renderCenteredRow = (label, numbers, perRow = null) => {
     if (!numbers || numbers.length === 0) return null;
     const split = perRow ? [numbers.slice(0, perRow), numbers.slice(perRow)] : [numbers];
-    
+
     return split.map((row, rowIndex) => (
-      <tr key={label + rowIndex}>
+      <tr key={label + rowIndex} className="border-b border-gray-100">
         {rowIndex === 0 && (
           <td
             rowSpan={split.length}
-            className="font-bold px-2 py-1 text-center align-middle bg-gray-100 border p-1"
+            className="font-bold px-2 py-1.5 text-center align-middle bg-gray-50 border-r border-gray-200 text-gray-600 text-xs w-8"
           >
             {label}
           </td>
         )}
-        <td colSpan="6" className="text-center py-1 border p-1">
-          <div className="flex justify-center gap-6 flex-wrap">
+        <td colSpan="6" className="py-1.5 px-2">
+          <div className="flex justify-start gap-1.5 flex-wrap">
             {row.map((num, idx) => (
               <div
                 key={idx}
-                className="min-w-[64px] text-center px-2 border border-gray-200 rounded bg-white"
+                className="min-w-[52px] text-center px-1.5 py-0.5 border border-gray-100 rounded-lg bg-white shadow-sm"
               >
-                <span className="font-semibold">{num.slice(0, -2)}</span>
-                <span className="text-red-600 font-bold">{num.slice(-2)}</span>
+                <span className="font-medium text-gray-600 text-sm">{num.slice(0, -2)}</span>
+                <span className="text-red-600 font-bold text-sm">{num.slice(-2)}</span>
               </div>
             ))}
           </div>
@@ -129,54 +130,64 @@ function Home() {
     <div>
       <Helmet>
         <title>XSMB - Tra cứu kết quả xổ số miền Bắc hôm nay</title>
-        <meta name="description" content="Tra cứu kết quả xổ số miền Bắc (XSMB) hôm nay nhanh nhất, chính xác nhất. Xem kết quả theo ngày, lô đặc biệt, thống kê chi tiết." />
+        <meta name="description" content="Tra cứu kết quả xổ số miền Bắc (XSMB) hôm nay nhanh nhất, chính xác nhất." />
       </Helmet>
 
-      <div className="mt-4 grid grid-cols-2 gap-4 text-sm font-semibold">
-        <div>
-          Cầu Ông Phong:{" "}
+      {/* Cầu prediction cards */}
+      <div className="grid grid-cols-2 gap-3 mb-3">
+        <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3">
+          <div className="text-xs font-semibold text-emerald-600 uppercase tracking-wide mb-1">Cầu Ông Phong</div>
           {ongPhongResult ? (
-            <span className="font-bold text-green-600">
-              {ongPhongResult.predictions?.join(", ") || "Không có"}
-            </span>
+            <div className="font-bold text-emerald-800">
+              {ongPhongResult.predictions?.join(", ") || "—"}
+            </div>
           ) : (
-            <span className="text-gray-400 text-sm">Đang tải...</span>
+            <div className="text-gray-400 text-xs">Đang tải...</div>
           )}
         </div>
-        <div>
-          Cầu Pascal:{" "}
+        <div className="bg-red-50 border border-red-200 rounded-xl p-3">
+          <div className="text-xs font-semibold text-red-600 uppercase tracking-wide mb-1">Cầu Pascal</div>
           {pascalPredictions.length > 0 ? (
-            <span className="text-red-600">
+            <div className="font-bold text-red-700">
               {pascalPredictions.join(", ")}
-            </span>
+            </div>
           ) : (
-            <span className="text-gray-400 text-sm">Chưa có dữ liệu</span>
+            <div className="text-gray-400 text-xs">Chưa có</div>
           )}
         </div>
       </div>
 
+      {/* Absent numbers badges */}
       {longestAbsent.length > 0 && (
-        <div className="mt-4 text-sm">
-          <div className="flex flex-wrap gap-3 mt-1 text-blue-800">
+        <div className="mb-3">
+          <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1.5">Số lâu vắng (≥5 ngày)</div>
+          <div className="flex flex-wrap gap-1.5">
             {longestAbsent.map((item, idx) => (
-              <span key={idx}>
+              <span
+                key={idx}
+                className="inline-flex items-baseline gap-0.5 bg-blue-50 border border-blue-200 text-blue-800 rounded-full px-2 py-0.5 text-sm font-semibold"
+              >
                 {item.number}
-                <sup className="text-red-500 text-xs ml-0.5">{item.days_absent}</sup>
+                <sup className="text-red-500 text-xs font-bold">{item.days_absent}</sup>
               </span>
             ))}
           </div>
         </div>
       )}
 
+      {/* Lottery results table */}
       {data && (
         <>
-          <div className="overflow-x-auto">
-            <table className="table-auto border text-sm w-full max-w-lg bg-white">
+          <div className="overflow-x-auto rounded-xl border border-gray-200 shadow-sm">
+            <table className="table-auto text-sm w-full max-w-lg bg-white border-collapse">
               <tbody>
-                <tr className="bg-blue-50">
-                  <td className="font-bold px-2 py-1 text-center bg-gray-100 border p-1">ĐB</td>
-                  <td colSpan="6" className="text-center text-red-600 font-extrabold text-lg border p-1">
-                    {data.g0}
+                {/* Special prize */}
+                <tr className="border-b border-gray-100">
+                  <td className="font-bold px-2 py-2 text-center bg-amber-50 border-r border-gray-200 text-amber-700 text-xs w-8">ĐB</td>
+                  <td colSpan="6" className="text-center bg-amber-50 py-3">
+                    <div className="inline-block bg-red-600 text-white text-2xl font-black px-5 py-1.5 rounded-xl shadow-md tracking-widest ring-2 ring-red-200">
+                      {data.g0}
+                    </div>
                   </td>
                 </tr>
                 {renderCenteredRow("1", getList(data.g1))}
@@ -195,7 +206,6 @@ function Home() {
           )}
         </>
       )}
-
     </div>
   );
 }

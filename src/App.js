@@ -1,4 +1,3 @@
-// src/App.js
 import { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { HeaderSlotProvider, useHeaderSlot } from './HeaderSlotContext';
@@ -23,14 +22,14 @@ function HeaderSlot() {
 }
 
 const PAGE_TITLES = {
-  '/': 'Kết quả XSMB',
+  '/': 'Kết quả hôm nay',
   '/statistic': 'Thống kê lô theo số',
-  '/full-statistic': 'Thống kê lô tổng quát',
-  '/longest-absent': 'Số lâu chưa xuất hiện',
+  '/full-statistic': 'Thống kê tổng quát',
+  '/longest-absent': 'Số lâu vắng mặt',
   '/combination-advanced': 'Tổ hợp đề 5 số',
-  '/classify': 'Phân loại số 2 chữ số',
+  '/classify': 'Phân loại 2 chữ số',
   '/generate-combinations': 'Sinh tổ hợp nhóm',
-  '/specials': 'Giải đặc biệt 2 tháng',
+  '/specials': 'Giải đặc biệt',
   '/cau-lo': 'Cầu Lô',
   '/chat': 'Chat',
   '/server-info': 'Server Info',
@@ -38,50 +37,102 @@ const PAGE_TITLES = {
   '/logsbydevice': 'Logs by Device',
 };
 
+const NAV_ITEMS = [
+  { label: '📅 Tra cứu theo ngày', path: '/' },
+  { label: '📊 Thống kê lô theo số', path: '/statistic' },
+  { label: '🔢 Thống kê lô tổng quát', path: '/full-statistic' },
+  { label: '🕵️ Số lâu chưa xuất hiện', path: '/longest-absent' },
+  { label: '🧪 Tổ hợp đề 5 số', path: '/combination-advanced' },
+  { label: '🎯 Sinh tổ hợp nhóm', path: '/generate-combinations' },
+  { label: '🔎 Phân loại số 2 chữ số', path: '/classify' },
+  { label: '🏆 Giải đặc biệt 2 tháng', path: '/specials' },
+  { label: '🃏 Cầu Lô', path: '/cau-lo' },
+  { label: '💬 Chat', path: '/chat' },
+  { label: '🖥️ Server Info', path: '/server-info' },
+  { label: '📋 Logs', path: '/logs' },
+  { label: '📱 Logs by Device', path: '/logsbydevice' },
+];
+
 function AppLayout() {
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
   const pageTitle = PAGE_TITLES[location.pathname] || 'XSMB';
 
   return (
-    <div className="app-container text-base">
-      <div className="marquee-wrapper">
-        <div className="marquee-track">
-          {[...Array(20)].map((_, i) => (
-            <img key={i} src="/co1.jpg" alt="" />
-          ))}
+    <div className="min-h-screen bg-slate-50">
+      {/* Sticky header */}
+      <header className="sticky top-0 z-30 bg-red-700 text-white shadow-lg">
+        <div className="marquee-wrapper" style={{ background: 'rgba(0,0,0,0.15)' }}>
+          <div className="marquee-track">
+            {[...Array(20)].map((_, i) => (
+              <img key={i} src="/co1.jpg" alt="" />
+            ))}
+          </div>
         </div>
-      </div>
-      <div className="flex items-center gap-3 px-2 pb-1">
-        <button className="menu-toggle" onClick={() => setMenuOpen(!menuOpen)}>
-          ☰
-        </button>
-        <h1 className="text-lg font-bold">{pageTitle}</h1>
-        <HeaderSlot />
-      </div>
+        <div className="flex items-center px-3 h-12 gap-2">
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="p-2 rounded-lg hover:bg-red-600 active:bg-red-800 transition-colors flex-shrink-0"
+            aria-label="Mở menu"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+              <line x1="3" y1="6" x2="21" y2="6"/>
+              <line x1="3" y1="12" x2="21" y2="12"/>
+              <line x1="3" y1="18" x2="21" y2="18"/>
+            </svg>
+          </button>
+          <span className="font-extrabold text-base tracking-wide flex-shrink-0">XSMB</span>
+          <span className="text-red-200 text-xs truncate hidden sm:block">· {pageTitle}</span>
+          <HeaderSlot />
+        </div>
+      </header>
 
+      {/* Sidebar overlay */}
       {menuOpen && (
-        <div className="menu-overlay" onClick={() => setMenuOpen(false)} />
+        <div
+          className="fixed inset-0 bg-black/50 z-40"
+          onClick={() => setMenuOpen(false)}
+        />
       )}
-      <div className={`sidebar ${menuOpen ? 'open1' : 'close1'}`}>
-        <ul>
-          <li><Link to="/" onClick={() => setMenuOpen(false)}>📅 Tra cứu theo ngày</Link></li>
-          <li><Link to="/statistic" onClick={() => setMenuOpen(false)}>📊 Thống kê lô theo số</Link></li>
-          <li><Link to="/full-statistic" onClick={() => setMenuOpen(false)}>🔢 Thống kê lô tổng quát</Link></li>
-          <li><Link to="/longest-absent" onClick={() => setMenuOpen(false)}>🕵️ Số lâu chưa xuất hiện</Link></li>
-          <li><Link to="/combination-advanced" onClick={() => setMenuOpen(false)}>🧪 Tổ hợp đề 5 số</Link></li>
-          <li><Link to="/classify" onClick={() => setMenuOpen(false)}>🔎 Phân loại số 2 chữ số</Link></li>
-          <li><Link to="/generate-combinations" onClick={() => setMenuOpen(false)}>🎯 Sinh tổ hợp nhóm</Link></li>
-          <li><Link to="/specials" onClick={() => setMenuOpen(false)}>🎯 Giải đặc biệt 2 tháng</Link></li>
-          <li><Link to="/cau-lo" onClick={() => setMenuOpen(false)}>🎯 Cầu Lô</Link></li>
-          <li><Link to="/chat" onClick={() => setMenuOpen(false)}>🎯 Chat</Link></li>
-          <li><Link to="/server-info" onClick={() => setMenuOpen(false)}>🎯 Server Info</Link></li>
-          <li><Link to="/logs" onClick={() => setMenuOpen(false)}>🎯 Logs</Link></li>
-          <li><Link to="/logsbydevice" onClick={() => setMenuOpen(false)}>🎯 Logs by Device</Link></li>
-        </ul>
-      </div>
 
-      <div className="main-content">
+      {/* Sidebar */}
+      <aside className={`fixed top-0 left-0 h-full w-72 bg-gray-900 z-50 transform transition-transform duration-300 flex flex-col shadow-2xl
+        ${menuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="flex items-center justify-between px-5 py-4 bg-red-700 flex-shrink-0">
+          <div>
+            <div className="font-extrabold text-white text-xl tracking-wider">XSMB</div>
+            <div className="text-red-200 text-xs mt-0.5">Xổ số Miền Bắc</div>
+          </div>
+          <button
+            onClick={() => setMenuOpen(false)}
+            className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-red-600 text-white transition-colors text-xl leading-none"
+          >
+            ×
+          </button>
+        </div>
+        <nav className="flex-1 overflow-y-auto py-2">
+          {NAV_ITEMS.map(({ label, path }) => {
+            const active = location.pathname === path;
+            return (
+              <Link
+                key={path}
+                to={path}
+                onClick={() => setMenuOpen(false)}
+                className={`flex items-center px-5 py-3 text-sm font-medium transition-colors border-l-[3px] ${
+                  active
+                    ? 'bg-red-900/40 text-white border-red-400'
+                    : 'text-gray-300 hover:bg-gray-800 hover:text-white border-transparent'
+                }`}
+              >
+                {label}
+              </Link>
+            );
+          })}
+        </nav>
+      </aside>
+
+      {/* Main content */}
+      <main className="px-3 py-4">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/statistic" element={<StatisticPage />} />
@@ -97,7 +148,7 @@ function AppLayout() {
           <Route path="/logs" element={<Logs />} />
           <Route path="/logsbydevice" element={<LogsByDevicePage />} />
         </Routes>
-      </div>
+      </main>
     </div>
   );
 }
