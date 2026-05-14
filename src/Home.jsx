@@ -1,7 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Helmet } from 'react-helmet-async';
 import { useHeaderSlot } from './HeaderSlotContext';
 import apiClient from './utils/apiClient';
+
+function isAfter1815VN() {
+  const now = new Date();
+  const vnMinutes = (now.getUTCHours() * 60 + now.getUTCMinutes() + 7 * 60) % (24 * 60);
+  return vnMinutes >= 18 * 60 + 15;
+}
 
 function HeadTailTable({ headToTail, tailToHead }) {
   const renderTable = (map, label1, label2) => (
@@ -42,7 +48,10 @@ function Home() {
   const [pascalPredictions, setPascalPredictions] = useState([]);
   const [longestAbsent, setLongestAbsent] = useState([]);
   const [ganThreshold, setGanThreshold] = useState(10);
+  const [isLive, setIsLive] = useState(false);
   const { setSlot } = useHeaderSlot();
+  const dateRef = useRef(date);
+  const hasG0Ref = useRef(false);
 
   const getYesterday = () => {
     const d = new Date();
@@ -50,11 +59,40 @@ function Home() {
     return d.toISOString().slice(0, 10);
   };
 
+  const getToday = () => new Date().toISOString().slice(0, 10);
+
   useEffect(() => {
-    const yesterday = getYesterday();
-    setDate(yesterday);
-    fetchData(yesterday);
+    const initialDate = isAfter1815VN() ? getToday() : getYesterday();
+    setDate(initialDate);
+    fetchData(initialDate);
   }, []);
+
+  // Keep ref in sync so interval closure always has current date
+  useEffect(() => { dateRef.current = date; }, [date]);
+
+  // Check live status every minute; switch to today when it starts
+  useEffect(() => {
+    const check = () => {
+      const live = isAfter1815VN();
+      setIsLive(live);
+      if (live) {
+        const today = getToday();
+        if (dateRef.current !== today) setDate(today);
+      }
+    };
+    check();
+    const t = setInterval(check, 60000);
+    return () => clearInterval(t);
+  }, []);
+
+  // Poll every 30s during live — stops when g0 appears
+  useEffect(() => {
+    if (!isLive) return;
+    const t = setInterval(() => {
+      if (dateRef.current && !hasG0Ref.current) fetchData(dateRef.current);
+    }, 30000);
+    return () => clearInterval(t);
+  }, [isLive]);
 
   useEffect(() => {
     setSlot(
@@ -85,6 +123,10 @@ function Home() {
 
       const res = await apiClient.get(`/api/history?date=${targetDate}`);
       setData(res.data);
+      if (res.data?.g0) {
+        hasG0Ref.current = true;
+        setIsLive(false);
+      }
 
       const absentRes = await apiClient.get(`${baseUrl}/api/statistics/longest-absent?days=60`);
       setLongestAbsent(absentRes.data || []);
@@ -186,6 +228,17 @@ function Home() {
           )}
         </div>
       </div>
+
+      {/* Live indicator */}
+      {isLive && (
+        <div className="flex items-center gap-2 mb-3 px-3 py-2 bg-red-50 border border-red-200 rounded-xl">
+          <span className="relative flex h-2.5 w-2.5">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75" />
+            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-600" />
+          </span>
+          <span className="text-xs font-semibold text-red-700">Đang quay số – tự động cập nhật mỗi 30 giây</span>
+        </div>
+      )}
 
       {/* Lottery results table */}
       {data && (
