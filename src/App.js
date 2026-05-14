@@ -16,6 +16,7 @@ import LogsByDevicePage from './LogsByDevicePage';
 import ChatPage from './ChatPage';
 import MaxAbsentStatsPage from './MaxAbsentStatsPage';
 import NumerologyPage from './NumerologyPage';
+import TarotPage from './TarotPage';
 import WeekdayStatsPage from './WeekdayStatsPage';
 import HeadTailPage from './HeadTailPage';
 import AvgCyclePage from './AvgCyclePage';
@@ -43,6 +44,7 @@ const PAGE_TITLES = {
   '/specials': 'Giải đặc biệt',
   '/cau-lo': 'Cầu Lô',
   '/numerology': 'Tư vấn số ngày sinh',
+  '/tarot': 'Bốc bài may mắn',
   '/chat': 'Chat Mộng Mơ',
   '/server-info': 'Server Info',
   '/logs': 'Logs',
@@ -65,6 +67,7 @@ const NAV_ITEMS = [
   { label: '🏆 Giải đặc biệt 2 tháng', path: '/specials' },
   { label: '🃏 Cầu Lô', path: '/cau-lo' },
   { label: '🔯 Tư vấn số ngày sinh', path: '/numerology' },
+  { label: '🎴 Bốc bài may mắn', path: '/tarot' },
   { label: '💬 Chat Mộng Mơ', path: '/chat' },
   { label: '🖥️ Server Info', path: '/server-info' },
   { label: '📋 Logs', path: '/logs' },
@@ -234,6 +237,7 @@ function AppLayout() {
           <Route path="/generate-combinations" element={<CombinationGeneratorPage />} />
           <Route path="/specials" element={<SpecialsPage />} />
           <Route path="/numerology" element={<NumerologyPage />} />
+          <Route path="/tarot" element={<TarotPage />} />
           <Route path="/cau-lo" element={<CauLoPage />} />
           <Route path="/chat" element={<ChatPage />} />
           <Route path="/server-info" element={<ServerInfo />} />
