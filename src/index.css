@@ -24,9 +24,10 @@ html {
 }
 
 .marquee-track img {
-  height: 20px;
+  height: 28px;
   width: auto;
   display: inline-block;
+  mix-blend-mode: multiply;
   -webkit-transform: translateZ(0);
   transform: translateZ(0);
 }
