@@ -71,49 +71,66 @@ const NAV_ITEMS = [
   { label: '📱 Logs by Device', path: '/logsbydevice' },
 ];
 
-function BackgroundMusic() {
-  const audioRef = useRef(null);
-  const [playing, setPlaying] = useState(false);
-
-  useEffect(() => {
-    const audio = audioRef.current;
-    const tryPlay = () => audio.play().then(() => setPlaying(true)).catch(() => {});
-    tryPlay();
-    document.addEventListener('click', tryPlay, { once: true });
-    document.addEventListener('touchstart', tryPlay, { once: true });
-    return () => {
-      document.removeEventListener('click', tryPlay);
-      document.removeEventListener('touchstart', tryPlay);
-    };
-  }, []);
-
-  const toggle = () => {
-    const audio = audioRef.current;
-    if (audio.paused) { audio.play(); setPlaying(true); }
-    else { audio.pause(); setPlaying(false); }
-  };
-
+function SettingsModal({ onClose, musicEnabled, setMusicEnabled }) {
   return (
-    <>
-      <audio ref={audioRef} src="/bg-music.mp3" loop preload="auto" />
-      <button
-        onClick={toggle}
-        title={playing ? 'Tắt nhạc' : 'Bật nhạc'}
-        className="ml-auto flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors text-base"
-      >
-        {playing ? '🔊' : '🔇'}
-      </button>
-    </>
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
+      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 z-10">
+        <div className="flex items-center justify-between mb-5">
+          <h2 className="font-bold text-gray-800 text-lg">Cài đặt</h2>
+          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-500 text-xl leading-none">×</button>
+        </div>
+
+        <div className="flex items-center justify-between py-3 border-b border-gray-100">
+          <div>
+            <div className="text-sm font-semibold text-gray-700">Nhạc nền</div>
+            <div className="text-xs text-gray-400 mt-0.5">Phát nhạc nền khi dùng app</div>
+          </div>
+          <button
+            onClick={() => setMusicEnabled(v => !v)}
+            className={`relative w-12 h-6 rounded-full transition-colors duration-200 ${musicEnabled ? 'bg-red-600' : 'bg-gray-300'}`}
+          >
+            <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${musicEnabled ? 'translate-x-6' : 'translate-x-0'}`} />
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
 
 function AppLayout() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [musicEnabled, setMusicEnabled] = useState(true);
+  const audioRef = useRef(null);
   const location = useLocation();
   const pageTitle = PAGE_TITLES[location.pathname] || 'XSMB';
 
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (musicEnabled) {
+      audio.play().catch(() => {
+        const tryPlay = () => { audio.play().catch(() => {}); };
+        document.addEventListener('click', tryPlay, { once: true });
+        document.addEventListener('touchstart', tryPlay, { once: true });
+      });
+    } else {
+      audio.pause();
+    }
+  }, [musicEnabled]);
+
   return (
     <div className="min-h-screen bg-slate-50">
+      <audio ref={audioRef} src="/bg-music.mp3" loop preload="auto" />
+      {settingsOpen && (
+        <SettingsModal
+          onClose={() => setSettingsOpen(false)}
+          musicEnabled={musicEnabled}
+          setMusicEnabled={setMusicEnabled}
+        />
+      )}
+
       {/* Sticky header */}
       <header className="sticky top-0 z-30 bg-red-700 text-white shadow-lg">
         <div className="marquee-wrapper" style={{ background: 'rgba(0,0,0,0.15)' }}>
@@ -138,7 +155,7 @@ function AppLayout() {
           <span className="font-extrabold text-base tracking-wide flex-shrink-0">XSMB</span>
           <span className="text-red-200 text-xs truncate">· {pageTitle}</span>
           <HeaderSlot />
-          <BackgroundMusic />
+          <span className="ml-auto text-base flex-shrink-0">{musicEnabled ? '🔊' : '🔇'}</span>
         </div>
       </header>
 
@@ -184,6 +201,14 @@ function AppLayout() {
             );
           })}
         </nav>
+        <div className="flex-shrink-0 border-t border-gray-700 py-2">
+          <button
+            onClick={() => { setSettingsOpen(true); setMenuOpen(false); }}
+            className="flex items-center w-full px-5 py-3 text-sm font-medium text-gray-300 hover:bg-gray-800 hover:text-white transition-colors border-l-[3px] border-transparent gap-2"
+          >
+            ⚙️ Cài đặt
+          </button>
+        </div>
       </aside>
 
       {/* Main content */}
