@@ -33,7 +33,7 @@ const PAGE_TITLES = {
   '/generate-combinations': 'Sinh tổ hợp nhóm',
   '/specials': 'Giải đặc biệt',
   '/cau-lo': 'Cầu Lô',
-  '/chat': 'Chat',
+  '/chat': 'Chat Mộng Mơ',
   '/server-info': 'Server Info',
   '/logs': 'Logs',
   '/logsbydevice': 'Logs by Device',
@@ -50,7 +50,7 @@ const NAV_ITEMS = [
   { label: '🔎 Phân loại số 2 chữ số', path: '/classify' },
   { label: '🏆 Giải đặc biệt 2 tháng', path: '/specials' },
   { label: '🃏 Cầu Lô', path: '/cau-lo' },
-  { label: '💬 Chat', path: '/chat' },
+  { label: '💬 Chat Mộng Mơ', path: '/chat' },
   { label: '🖥️ Server Info', path: '/server-info' },
   { label: '📋 Logs', path: '/logs' },
   { label: '📱 Logs by Device', path: '/logsbydevice' },
@@ -85,7 +85,7 @@ function AppLayout() {
             </svg>
           </button>
           <span className="font-extrabold text-base tracking-wide flex-shrink-0">XSMB</span>
-          <span className="text-red-200 text-xs truncate hidden sm:block">· {pageTitle}</span>
+          <span className="text-red-200 text-xs truncate">· {pageTitle}</span>
           <HeaderSlot />
         </div>
       </header>
