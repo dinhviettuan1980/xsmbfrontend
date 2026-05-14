@@ -83,23 +83,44 @@ function NumberCard({ label, number, pairs, highlight }) {
 }
 
 export default function NumerologyPage() {
-  const [dob, setDob] = useState('');
+  const [dd, setDd] = useState('');
+  const [mm, setMm] = useState('');
+  const [yyyy, setYyyy] = useState('');
   const [result, setResult] = useState(null);
+  const mmRef = React.useRef();
+  const yyyyRef = React.useRef();
+
+  const isValid = dd && mm && yyyy && yyyy.length === 4;
 
   const compute = () => {
-    if (!dob) return;
-    const dobDate = new Date(dob);
+    if (!isValid) return;
+    const dobDate = new Date(parseInt(yyyy), parseInt(mm) - 1, parseInt(dd));
     if (isNaN(dobDate.getTime())) return;
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-
     const lp = lifePathNumber(dobDate);
     const py = personalYear(dobDate, today);
     const pm = personalMonth(dobDate, today);
     const pd = personalDay(dobDate, today);
-
     setResult({ lp, py, pm, pd, today });
   };
+
+  const handleDd = e => {
+    const v = e.target.value.replace(/\D/g, '').slice(0, 2);
+    setDd(v); setResult(null);
+    if (v.length === 2) mmRef.current?.focus();
+  };
+  const handleMm = e => {
+    const v = e.target.value.replace(/\D/g, '').slice(0, 2);
+    setMm(v); setResult(null);
+    if (v.length === 2) yyyyRef.current?.focus();
+  };
+  const handleYyyy = e => {
+    const v = e.target.value.replace(/\D/g, '').slice(0, 4);
+    setYyyy(v); setResult(null);
+  };
+
+  const inputCls = "w-12 border border-gray-200 rounded-lg px-2 py-2 text-sm text-center focus:outline-none focus:ring-2 focus:ring-red-500 bg-white font-semibold";
 
   return (
     <div>
@@ -111,16 +132,17 @@ export default function NumerologyPage() {
       <div className="flex flex-wrap items-end gap-3 mb-6">
         <div>
           <label className="block text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wide">Ngày sinh</label>
-          <input
-            type="date"
-            value={dob}
-            onChange={e => { setDob(e.target.value); setResult(null); }}
-            className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 bg-white"
-          />
+          <div className="flex items-center gap-1">
+            <input inputMode="numeric" placeholder="DD" value={dd} onChange={handleDd} className={inputCls} />
+            <span className="text-gray-400 font-bold">/</span>
+            <input inputMode="numeric" placeholder="MM" value={mm} onChange={handleMm} ref={mmRef} className={inputCls} />
+            <span className="text-gray-400 font-bold">/</span>
+            <input inputMode="numeric" placeholder="YYYY" value={yyyy} onChange={handleYyyy} ref={yyyyRef} className="w-16 border border-gray-200 rounded-lg px-2 py-2 text-sm text-center focus:outline-none focus:ring-2 focus:ring-red-500 bg-white font-semibold" onKeyDown={e => e.key === 'Enter' && compute()} />
+          </div>
         </div>
         <button
           onClick={compute}
-          disabled={!dob}
+          disabled={!isValid}
           className="bg-red-600 hover:bg-red-700 disabled:opacity-40 text-white px-5 py-2 rounded-lg text-sm font-semibold transition-colors"
         >
           Tư vấn
