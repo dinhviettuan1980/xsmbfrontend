@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { HeaderSlotProvider, useHeaderSlot } from './HeaderSlotContext';
 import Home from './Home';
@@ -71,6 +71,42 @@ const NAV_ITEMS = [
   { label: '📱 Logs by Device', path: '/logsbydevice' },
 ];
 
+function BackgroundMusic() {
+  const audioRef = useRef(null);
+  const [playing, setPlaying] = useState(false);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    const tryPlay = () => audio.play().then(() => setPlaying(true)).catch(() => {});
+    tryPlay();
+    document.addEventListener('click', tryPlay, { once: true });
+    document.addEventListener('touchstart', tryPlay, { once: true });
+    return () => {
+      document.removeEventListener('click', tryPlay);
+      document.removeEventListener('touchstart', tryPlay);
+    };
+  }, []);
+
+  const toggle = () => {
+    const audio = audioRef.current;
+    if (audio.paused) { audio.play(); setPlaying(true); }
+    else { audio.pause(); setPlaying(false); }
+  };
+
+  return (
+    <>
+      <audio ref={audioRef} src="/bg-music.mp3" loop preload="auto" />
+      <button
+        onClick={toggle}
+        title={playing ? 'Tắt nhạc' : 'Bật nhạc'}
+        className="ml-auto flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors text-base"
+      >
+        {playing ? '🔊' : '🔇'}
+      </button>
+    </>
+  );
+}
+
 function AppLayout() {
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
@@ -102,6 +138,7 @@ function AppLayout() {
           <span className="font-extrabold text-base tracking-wide flex-shrink-0">XSMB</span>
           <span className="text-red-200 text-xs truncate">· {pageTitle}</span>
           <HeaderSlot />
+          <BackgroundMusic />
         </div>
       </header>
 
