@@ -155,7 +155,13 @@ function AppLayout() {
           <span className="font-extrabold text-base tracking-wide flex-shrink-0">XSMB</span>
           <span className="text-red-200 text-xs truncate">· {pageTitle}</span>
           <HeaderSlot />
-          <span className="ml-auto text-base flex-shrink-0">{musicEnabled ? '🔊' : '🔇'}</span>
+          <button
+            onClick={() => setMusicEnabled(v => !v)}
+            className="ml-auto p-1.5 rounded-lg hover:bg-red-600 active:bg-red-800 transition-colors flex-shrink-0 text-base leading-none"
+            aria-label={musicEnabled ? 'Tắt nhạc' : 'Bật nhạc'}
+          >
+            {musicEnabled ? '🔊' : '🔇'}
+          </button>
         </div>
       </header>
 
