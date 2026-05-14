@@ -16,6 +16,10 @@ import LogsByDevicePage from './LogsByDevicePage';
 import ChatPage from './ChatPage';
 import MaxAbsentStatsPage from './MaxAbsentStatsPage';
 import NumerologyPage from './NumerologyPage';
+import WeekdayStatsPage from './WeekdayStatsPage';
+import HeadTailPage from './HeadTailPage';
+import AvgCyclePage from './AvgCyclePage';
+import CoOccurrencePage from './CoOccurrencePage';
 import './index.css';
 
 function HeaderSlot() {
@@ -29,6 +33,10 @@ const PAGE_TITLES = {
   '/full-statistic': 'Thống kê tổng quát',
   '/longest-absent': 'Số lâu vắng mặt',
   '/max-absent-stats': 'Ngày vắng cực đại',
+  '/weekday-stats': 'Thống kê theo thứ',
+  '/head-tail': 'Đầu đuôi nóng lạnh',
+  '/avg-cycle': 'Chu kỳ trung bình',
+  '/co-occurrence': 'Số về cùng nhau',
   '/combination-advanced': 'Tổ hợp đề 5 số',
   '/classify': 'Phân loại 2 chữ số',
   '/generate-combinations': 'Sinh tổ hợp nhóm',
@@ -47,6 +55,10 @@ const NAV_ITEMS = [
   { label: '🔢 Thống kê lô tổng quát', path: '/full-statistic' },
   { label: '🕵️ Số lâu chưa xuất hiện', path: '/longest-absent' },
   { label: '📉 Ngày vắng cực đại', path: '/max-absent-stats' },
+  { label: '📆 Thống kê theo thứ', path: '/weekday-stats' },
+  { label: '🌡️ Đầu đuôi nóng lạnh', path: '/head-tail' },
+  { label: '🔄 Chu kỳ trung bình', path: '/avg-cycle' },
+  { label: '🤝 Số về cùng nhau', path: '/co-occurrence' },
   { label: '🧪 Tổ hợp đề 5 số', path: '/combination-advanced' },
   { label: '🎯 Sinh tổ hợp nhóm', path: '/generate-combinations' },
   { label: '🔎 Phân loại số 2 chữ số', path: '/classify' },
@@ -145,6 +157,10 @@ function AppLayout() {
           <Route path="/full-statistic" element={<FullStatisticPage />} />
           <Route path="/longest-absent" element={<LongestAbsentPage />} />
           <Route path="/max-absent-stats" element={<MaxAbsentStatsPage />} />
+          <Route path="/weekday-stats" element={<WeekdayStatsPage />} />
+          <Route path="/head-tail" element={<HeadTailPage />} />
+          <Route path="/avg-cycle" element={<AvgCyclePage />} />
+          <Route path="/co-occurrence" element={<CoOccurrencePage />} />
           <Route path="/combination-advanced" element={<CombinationAdvancedPage />} />
           <Route path="/classify" element={<ClassifyPage />} />
           <Route path="/generate-combinations" element={<CombinationGeneratorPage />} />
