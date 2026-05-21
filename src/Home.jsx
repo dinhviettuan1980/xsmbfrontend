@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { Helmet } from 'react-helmet-async';
+import { Link } from 'react-router-dom';
 import { useHeaderSlot } from './HeaderSlotContext';
 import apiClient from './utils/apiClient';
 
@@ -48,6 +49,8 @@ function Home() {
   const [pascalPredictions, setPascalPredictions] = useState([]);
   const [longestAbsent, setLongestAbsent] = useState([]);
   const [ganThreshold, setGanThreshold] = useState(10);
+  const [weekdayTop6, setWeekdayTop6] = useState([]);
+  const [weekdayRecent, setWeekdayRecent] = useState(new Set());
   const [isLive, setIsLive] = useState(false);
   const { setSlot } = useHeaderSlot();
   const dateRef = useRef(date);
@@ -90,7 +93,7 @@ function Home() {
     if (!isLive) return;
     const t = setInterval(() => {
       if (dateRef.current && !hasG0Ref.current) fetchData(dateRef.current);
-    }, 5000);
+    }, 500);
     return () => clearInterval(t);
   }, [isLive]);
 
@@ -110,7 +113,9 @@ function Home() {
     if (date) fetchData(date);
   }, [date]);
 
-  const fetchData = async (targetDate) => {
+  const isValidG0 = (g0) => g0 && /^\d{5}$/.test(g0.trim());
+
+  const fetchData = async (targetDate, isRetry = false) => {
     try {
       const baseUrl = process.env.REACT_APP_API_BASE;
       if (!targetDate) return;
@@ -123,17 +128,45 @@ function Home() {
 
       const res = await apiClient.get(`/api/history?date=${targetDate}`);
       setData(res.data);
-      if (res.data?.g0) {
+
+      if (isValidG0(res.data?.g0)) {
         hasG0Ref.current = true;
         setIsLive(false);
+      } else if (!isRetry) {
+        // Dữ liệu thiếu/sai → tự crawl lại 1 lần
+        try {
+          await apiClient.get(`${baseUrl}/crawl`);
+          setTimeout(() => fetchData(targetDate, true), 3000);
+        } catch (_) {}
       }
 
       const absentRes = await apiClient.get(`${baseUrl}/api/statistics/longest-absent?days=60`);
       setLongestAbsent(absentRes.data || []);
+
+      // Weekday top 6 for today
+      const jsDay = new Date().getDay();
+      const vnDay = jsDay === 0 ? 8 : jsDay + 1;
+      const [wdRes, wdRecentRes] = await Promise.all([
+        apiClient.get(`${baseUrl}/api/statistics/by-weekday?days=365`),
+        apiClient.get(`${baseUrl}/api/statistics/weekday-recent`),
+      ]);
+      const dayData = wdRes.data[vnDay] || {};
+      const top6 = Object.entries(dayData)
+        .map(([n, c]) => ({ number: n, count: c }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 6);
+      setWeekdayTop6(top6);
+      setWeekdayRecent(new Set(wdRecentRes.data[vnDay]?.numbers || []));
     } catch (err) {
       console.error("Lỗi lấy dữ liệu:", err);
     }
   };
+
+  const absentMap = useMemo(() => {
+    const m = {};
+    longestAbsent.forEach(r => { m[r.number] = r.days_absent; });
+    return m;
+  }, [longestAbsent]);
 
   const renderCenteredRow = (label, numbers, perRow = null) => {
     if (!numbers || numbers.length === 0) return null;
@@ -177,36 +210,67 @@ function Home() {
 
       {/* Cầu prediction cards */}
       <div className="grid grid-cols-2 gap-3 mb-3">
-        <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3">
+        <Link to="/cau-lo" className="bg-emerald-50 border border-emerald-200 rounded-xl p-3 block active:opacity-70">
           <div className="text-xs font-semibold text-emerald-600 uppercase tracking-wide mb-1">Cầu Ông Phong</div>
           {ongPhongResult ? (
-            <div className="font-bold text-emerald-800">
-              {ongPhongResult.predictions?.join(", ") || "—"}
+            <div className="font-bold text-emerald-800 flex flex-wrap gap-x-2">
+              {(ongPhongResult.predictions || []).map(n => (
+                <span key={n} className="inline-flex items-baseline">
+                  {n}
+                  {absentMap[n] > 0 && <sup className="text-red-500 text-xs font-bold ml-0.5">{absentMap[n]}</sup>}
+                </span>
+              ))}
             </div>
           ) : (
             <div className="text-gray-400 text-xs">Đang tải...</div>
           )}
-        </div>
-        <div className="bg-red-50 border border-red-200 rounded-xl p-3">
+        </Link>
+        <Link to="/cau-lo" className="bg-red-50 border border-red-200 rounded-xl p-3 block active:opacity-70">
           <div className="text-xs font-semibold text-red-600 uppercase tracking-wide mb-1">Cầu Pascal</div>
           {pascalPredictions.length > 0 ? (
-            <div className="font-bold text-red-700">
-              {pascalPredictions.join(", ")}
+            <div className="font-bold text-red-700 flex flex-wrap gap-x-2">
+              {pascalPredictions.map(n => (
+                <span key={n} className="inline-flex items-baseline">
+                  {n}
+                  {absentMap[n] > 0 && <sup className="text-red-500 text-xs font-bold ml-0.5">{absentMap[n]}</sup>}
+                </span>
+              ))}
             </div>
           ) : (
             <div className="text-gray-400 text-xs">Chưa có</div>
           )}
-        </div>
+        </Link>
       </div>
 
+      {/* Số hay ra theo thứ hôm nay */}
+      {weekdayTop6.length > 0 && (
+        <Link to="/weekday-stats" className="block mb-3 bg-amber-50 border border-amber-200 rounded-xl p-3 active:opacity-70">
+          <div className="text-xs font-semibold text-amber-700 uppercase tracking-wide mb-2">
+            Hay về {['', '', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'CN'][new Date().getDay() === 0 ? 8 : new Date().getDay() + 1]}
+          </div>
+          <div className="flex gap-2 flex-wrap">
+            {weekdayTop6.map(({ number }) => {
+              const hit = weekdayRecent.has(number);
+              return (
+                <span key={number} className={`inline-flex items-baseline font-bold text-sm rounded-full px-2 py-0.5 border ${hit ? 'text-green-600 bg-green-50 border-green-300' : 'text-gray-800 bg-white border-gray-200'}`}>
+                  {number}
+                  {absentMap[number] > 0 && <sup className="text-red-500 text-xs font-bold ml-0.5">{absentMap[number]}</sup>}
+                </span>
+              );
+            })}
+          </div>
+        </Link>
+      )}
+
       {/* Lô Gan */}
-      <div className="mb-3">
-        <div className="flex items-center gap-2 mb-1.5">
-          <div className="text-xs font-bold text-gray-600 uppercase tracking-wide">LÔ Gan ≥</div>
+      <Link to="/longest-absent" className="block mb-3 bg-blue-50 border border-blue-200 rounded-xl p-3 active:opacity-70">
+        <div className="flex items-center gap-2 mb-2">
+          <div className="text-xs font-semibold text-blue-700 uppercase tracking-wide">Lô Gan ≥</div>
           <select
             value={ganThreshold}
-            onChange={e => setGanThreshold(Number(e.target.value))}
-            className="border border-gray-200 rounded-lg px-2 py-0.5 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-red-500 bg-white text-gray-700"
+            onChange={e => { e.preventDefault(); e.stopPropagation(); setGanThreshold(Number(e.target.value)); }}
+            onClick={e => e.stopPropagation()}
+            className="border border-blue-200 rounded-lg px-2 py-0.5 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white text-gray-700"
           >
             {[5, 7, 10, 14, 20, 25, 30].map(v => (
               <option key={v} value={v}>{v} ngày</option>
@@ -227,7 +291,7 @@ function Home() {
             <span className="text-xs text-gray-400">Không có số nào vắng ≥ {ganThreshold} ngày</span>
           )}
         </div>
-      </div>
+      </Link>
 
       {/* Live indicator */}
       {isLive && (
@@ -236,7 +300,7 @@ function Home() {
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75" />
             <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-600" />
           </span>
-          <span className="text-xs font-semibold text-red-700">Đang quay số – tự động cập nhật mỗi 5 giây</span>
+          <span className="text-xs font-semibold text-red-700">Đang quay số – tự động cập nhật mỗi 0.5 giây</span>
         </div>
       )}
 

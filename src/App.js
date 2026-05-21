@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
+import apiClient from './utils/apiClient';
 import { HeaderSlotProvider, useHeaderSlot } from './HeaderSlotContext';
 import Home from './Home';
 import StatisticPage from './StatisticPage';
@@ -29,7 +30,7 @@ function HeaderSlot() {
 }
 
 const PAGE_TITLES = {
-  '/': 'Kết quả hôm nay',
+  '/': 'Trang chủ',
   '/statistic': 'Thống kê lô theo số',
   '/full-statistic': 'Thống kê tổng quát',
   '/longest-absent': 'Số lâu vắng mặt',
@@ -52,29 +53,44 @@ const PAGE_TITLES = {
 };
 
 const NAV_ITEMS = [
-  { label: '📅 Tra cứu theo ngày', path: '/' },
-  { label: '📊 Thống kê lô theo số', path: '/statistic' },
-  { label: '🔢 Thống kê lô tổng quát', path: '/full-statistic' },
-  { label: '🕵️ Số lâu chưa xuất hiện', path: '/longest-absent' },
-  { label: '📉 Ngày vắng cực đại', path: '/max-absent-stats' },
+  { label: '🏠 Trang chủ', path: '/' },
   { label: '📆 Thống kê theo thứ', path: '/weekday-stats' },
-  { label: '🌡️ Đầu đuôi nóng lạnh', path: '/head-tail' },
-  { label: '🔄 Chu kỳ trung bình', path: '/avg-cycle' },
-  { label: '🤝 Số về cùng nhau', path: '/co-occurrence' },
+  { label: '📊 Thống kê lô theo số', path: '/statistic' },
   { label: '🧪 Tổ hợp đề 5 số', path: '/combination-advanced' },
   { label: '🎯 Sinh tổ hợp nhóm', path: '/generate-combinations' },
   { label: '🔎 Phân loại số 2 chữ số', path: '/classify' },
-  { label: '🏆 Giải đặc biệt 2 tháng', path: '/specials' },
-  { label: '🃏 Cầu Lô', path: '/cau-lo' },
+  { label: '💬 Chat Mộng Mơ', path: '/chat' },
   { label: '🔯 Tư vấn số ngày sinh', path: '/numerology' },
   { label: '🎴 Bốc bài may mắn', path: '/tarot' },
-  { label: '💬 Chat Mộng Mơ', path: '/chat' },
+  { label: '🃏 Cầu Lô', path: '/cau-lo' },
+  { label: '🔢 Thống kê lô tổng quát', path: '/full-statistic' },
+  { label: '🕵️ Số lâu chưa xuất hiện', path: '/longest-absent' },
+  { label: '📉 Ngày vắng cực đại', path: '/max-absent-stats' },
+  { label: '🌡️ Đầu đuôi nóng lạnh', path: '/head-tail' },
+  { label: '🔄 Chu kỳ trung bình', path: '/avg-cycle' },
+  { label: '🤝 Số về cùng nhau', path: '/co-occurrence' },
+  { label: '🏆 Giải đặc biệt 2 tháng', path: '/specials' },
   { label: '🖥️ Server Info', path: '/server-info' },
   { label: '📋 Logs', path: '/logs' },
   { label: '📱 Logs by Device', path: '/logsbydevice' },
 ];
 
 function SettingsModal({ onClose, musicEnabled, setMusicEnabled }) {
+  const [refreshState, setRefreshState] = useState('idle'); // idle | loading | done | error
+
+  const handleRefresh = async () => {
+    setRefreshState('loading');
+    try {
+      const baseUrl = process.env.REACT_APP_API_BASE;
+      await apiClient.get(`${baseUrl}/api/history/bulk`);
+      setRefreshState('done');
+      setTimeout(() => setRefreshState('idle'), 3000);
+    } catch {
+      setRefreshState('error');
+      setTimeout(() => setRefreshState('idle'), 3000);
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
@@ -94,6 +110,28 @@ function SettingsModal({ onClose, musicEnabled, setMusicEnabled }) {
             className={`relative w-12 h-6 rounded-full transition-colors duration-200 ${musicEnabled ? 'bg-red-600' : 'bg-gray-300'}`}
           >
             <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${musicEnabled ? 'translate-x-6' : 'translate-x-0'}`} />
+          </button>
+        </div>
+
+        <div className="flex items-center justify-between py-3">
+          <div>
+            <div className="text-sm font-semibold text-gray-700">Cập nhật kết quả</div>
+            <div className="text-xs text-gray-400 mt-0.5">Lấy lại 300 ngày gần nhất</div>
+          </div>
+          <button
+            onClick={handleRefresh}
+            disabled={refreshState === 'loading'}
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+              refreshState === 'done' ? 'bg-green-100 text-green-700' :
+              refreshState === 'error' ? 'bg-red-100 text-red-700' :
+              refreshState === 'loading' ? 'bg-gray-100 text-gray-400 cursor-not-allowed' :
+              'bg-red-600 text-white hover:bg-red-700'
+            }`}
+          >
+            {refreshState === 'loading' ? 'Đang tải...' :
+             refreshState === 'done' ? '✓ Xong' :
+             refreshState === 'error' ? '✗ Lỗi' :
+             'Cập nhật'}
           </button>
         </div>
       </div>
@@ -158,9 +196,16 @@ function AppLayout() {
           <span className="font-extrabold text-base tracking-wide flex-shrink-0">XSMB</span>
           <span className="text-red-200 text-xs truncate">· {pageTitle}</span>
           <HeaderSlot />
+          <Link
+            to="/chat"
+            className="ml-auto p-1.5 rounded-lg hover:bg-red-600 active:bg-red-800 transition-colors flex-shrink-0 text-base leading-none"
+            aria-label="Chat"
+          >
+            💬
+          </Link>
           <button
             onClick={() => setMusicEnabled(v => !v)}
-            className="ml-auto p-1.5 rounded-lg hover:bg-red-600 active:bg-red-800 transition-colors flex-shrink-0 text-base leading-none"
+            className="p-1.5 rounded-lg hover:bg-red-600 active:bg-red-800 transition-colors flex-shrink-0 text-base leading-none"
             aria-label={musicEnabled ? 'Tắt nhạc' : 'Bật nhạc'}
           >
             {musicEnabled ? '🔊' : '🔇'}
