@@ -273,19 +273,34 @@ export default function ZaloAdminPage() {
             <h3 className="font-bold text-lg mb-4">{form.id ? 'Sửa lịch' : 'Thêm lịch hẹn'}</h3>
 
             <label className="block text-sm font-medium text-gray-600 mb-1">Người nhận</label>
-            <input className="w-full border rounded-lg px-3 py-2 mb-1 text-sm" placeholder="Tìm theo tên…"
-              value={friendSearch} onChange={(e) => setFriendSearch(e.target.value)} />
             <div className="flex items-center justify-between mb-1">
               <span className="text-xs text-gray-400">{friends.length} bạn bè{friendsUpdatedAt ? ` · cập nhật ${timeAgo(friendsUpdatedAt)}` : ''}</span>
               <button className="text-xs text-blue-600 hover:underline" onClick={() => loadFriends(true)} disabled={friendsLoading}>
                 {friendsLoading ? 'đang tải…' : '↻ Lấy lại từ Zalo'}
               </button>
             </div>
-            <select className="w-full border rounded-lg px-3 py-2 mb-4 text-sm" value={form.targetId}
-              onChange={(e) => setForm((f) => ({ ...f, targetId: e.target.value }))}>
-              <option value="">— Chọn người nhận —</option>
-              {filteredFriends.map((f) => <option key={f.userId} value={f.userId}>{f.name || f.userId}</option>)}
-            </select>
+            <input className="w-full border rounded-lg px-3 py-2 mb-1 text-sm" placeholder="Tìm theo tên…"
+              value={friendSearch} onChange={(e) => setFriendSearch(e.target.value)} />
+            {form.targetId && !friendSearch && (
+              <div className="text-xs text-green-600 mb-2 px-1">
+                ✓ Đã chọn: {friends.find(f => f.userId === form.targetId)?.name || form.targetId}
+              </div>
+            )}
+            {friendSearch && (
+              <div className="border rounded-lg max-h-48 overflow-y-auto mb-4 bg-white shadow-sm">
+                {filteredFriends.length === 0 && (
+                  <div className="text-xs text-gray-400 px-3 py-2">Không tìm thấy</div>
+                )}
+                {filteredFriends.map((f) => (
+                  <button key={f.userId} type="button"
+                    className={`w-full text-left px-3 py-2 text-sm hover:bg-red-50 border-b last:border-0 ${form.targetId === f.userId ? 'bg-red-50 text-red-700 font-semibold' : 'text-gray-800'}`}
+                    onClick={() => { setForm((prev) => ({ ...prev, targetId: f.userId, targetName: f.name || '' })); setFriendSearch(''); }}>
+                    {f.name || f.userId}
+                  </button>
+                ))}
+              </div>
+            )}
+            {!friendSearch && <div className="mb-4" />}
 
             <label className="block text-sm font-medium text-gray-600 mb-1">Nội dung tin nhắn</label>
             <textarea className="w-full border rounded-lg px-3 py-2 mb-4 text-sm" rows={3}
