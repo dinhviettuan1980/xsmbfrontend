@@ -268,10 +268,11 @@ export default function ZaloAdminPage() {
               <button onClick={() => toggleEnabled(s)} className={`w-10 h-6 rounded-full flex-shrink-0 relative ${s.enabled ? 'bg-green-500' : 'bg-gray-300'}`}>
                 <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${s.enabled ? 'translate-x-4' : ''}`} />
               </button>
-              <div className="flex-1 min-w-0 cursor-pointer" onClick={() => { setHistoryFor({ targetId: s.targetId, targetName: s.targetName || s.targetId }); loadHistory(s.targetId); }}>
+              <div className="flex-1 min-w-0 cursor-pointer" onClick={() => { const name = s.targetName || contacts.find(c => c.userId === s.targetId)?.name || s.targetId; setHistoryFor({ targetId: s.targetId, targetName: name }); loadHistory(s.targetId); }}>
                 <div className="font-medium text-gray-800 truncate">
                   {s.isSpecial && <span className="text-amber-600 text-xs font-bold mr-1">✦ ĐẶC BIỆT</span>}
-                  {s.targetType === 'group' ? '👥 ' : ''}{s.targetName || s.targetId}
+                  {s.targetType === 'group' ? '👥 ' : ''}
+                  {s.targetName || contacts.find(c => c.userId === s.targetId)?.name || s.targetId}
                 </div>
                 <div className="text-sm text-gray-500 truncate">{s.isSpecial ? '🔒 secret (top 3 số theo thứ)' : s.message}</div>
                 <div className="text-xs text-gray-400 mt-0.5">
