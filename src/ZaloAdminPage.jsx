@@ -323,6 +323,16 @@ export default function ZaloAdminPage() {
 
             <div className="flex gap-2 justify-end">
               <button className="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-sm" onClick={() => setForm(null)}>Huỷ</button>
+              <button
+                className="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 text-sm font-semibold"
+                onClick={async () => {
+                  if (!form.targetId) return alert('Hãy chọn người nhận trước');
+                  if (!form.message.trim()) return alert('Hãy nhập nội dung trước');
+                  const r = await api('/zalo/send', { method: 'POST', body: JSON.stringify({ targetId: form.targetId, message: form.message }) });
+                  const d = await r.json();
+                  alert(d.ok ? '✅ Đã gửi thử' : '❌ ' + (d.error || 'thất bại'));
+                }}
+              >Gửi thử</button>
               <button className="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 text-sm font-semibold" onClick={saveForm}>Lưu</button>
             </div>
           </div>
