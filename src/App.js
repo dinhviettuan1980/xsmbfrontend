@@ -23,6 +23,7 @@ import HeadTailPage from './HeadTailPage';
 import AvgCyclePage from './AvgCyclePage';
 import CoOccurrencePage from './CoOccurrencePage';
 import ZaloAdminPage from './ZaloAdminPage';
+import GoogleLoginPage from './GoogleLogin';
 import './index.css';
 
 function HeaderSlot() {
@@ -292,6 +293,7 @@ function AppLayout() {
           <Route path="/logs" element={<Logs />} />
           <Route path="/logsbydevice" element={<LogsByDevicePage />} />
           <Route path="/zalo-admin" element={<ZaloAdminPage />} />
+          <Route path="/login" element={<GoogleLoginPage />} />
         </Routes>
       </main>
     </div>

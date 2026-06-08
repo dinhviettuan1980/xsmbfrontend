@@ -1,13 +1,18 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { GoogleLogin } from '@react-oauth/google';
 
 const API_BASE = process.env.REACT_APP_API_BASE || '';
 const DAY_LABELS = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7']; // index = day number (CN=0..T7=6)
 
-// ---- helpers gọi API (secret truyền qua query, khớp zaloAuth ở backend) ----
+// ---- xác thực: ưu tiên đăng nhập Google (email được phép ở backend),
+//      dự phòng NOTIFY_SECRET nếu chưa đăng nhập Google. ----
 function useSecret() {
   const [secret, setSecret] = useState(() => localStorage.getItem('zalo_secret') || '');
   const save = (v) => { setSecret(v); localStorage.setItem('zalo_secret', v); };
   return [secret, save];
+}
+function decodeJwt(t) {
+  try { return JSON.parse(atob(t.split('.')[1])); } catch { return null; }
 }
 
 function timeAgo(iso) {
@@ -25,6 +30,8 @@ function timeAgo(iso) {
 export default function ZaloAdminPage() {
   const [secret, setSecret] = useSecret();
   const [secretInput, setSecretInput] = useState(secret);
+  const [gToken, setGToken] = useState(() => localStorage.getItem('google_id_token') || '');
+  const [showSecret, setShowSecret] = useState(false); // hiện ô nhập NOTIFY_SECRET dự phòng
   const [status, setStatus] = useState(null);
   const [statusErr, setStatusErr] = useState('');
   const [loading, setLoading] = useState(false);
@@ -49,23 +56,27 @@ export default function ZaloAdminPage() {
   const [history, setHistory] = useState([]);
   const [historyLoading, setHistoryLoading] = useState(false);
 
+  const gPayload = gToken ? decodeJwt(gToken) : null;
+  const gValid = !!(gPayload && gPayload.exp && gPayload.exp * 1000 > Date.now());
+  const gEmail = gPayload?.email || '';
+  const authed = gValid || !!secret;
+
   const api = useCallback(async (path, opts = {}) => {
+    const headers = { 'Content-Type': 'application/json', ...(opts.headers || {}) };
+    if (gValid) headers.Authorization = `Bearer ${gToken}`;
     const sep = path.includes('?') ? '&' : '?';
-    const url = `${API_BASE}${path}${sep}secret=${encodeURIComponent(secret)}`;
-    const res = await fetch(url, {
-      ...opts,
-      headers: { 'Content-Type': 'application/json', ...(opts.headers || {}) },
-    });
+    const url = `${API_BASE}${path}${secret ? `${sep}secret=${encodeURIComponent(secret)}` : ''}`;
+    const res = await fetch(url, { ...opts, headers });
     if (!res.ok && res.status !== 202) {
       let msg = `HTTP ${res.status}`;
       try { const j = await res.json(); if (j.error) msg = j.error; } catch { /* noop */ }
       throw new Error(msg);
     }
     return res;
-  }, [secret]);
+  }, [secret, gToken, gValid]);
 
   const loadStatus = useCallback(async () => {
-    if (!secret) return;
+    if (!authed) return;
     setLoading(true); setStatusErr('');
     try {
       const r = await api('/zalo/health');
@@ -74,10 +85,10 @@ export default function ZaloAdminPage() {
       setStatusErr(e.message);
       setStatus(null);
     } finally { setLoading(false); }
-  }, [api, secret]);
+  }, [api, authed]);
 
   const loadFriends = useCallback(async (refresh = false) => {
-    if (!secret) return;
+    if (!authed) return;
     setFriendsLoading(true);
     try {
       const r = await api(`/zalo/friends${refresh ? '?refresh=1' : ''}`);
@@ -85,22 +96,22 @@ export default function ZaloAdminPage() {
       setContacts(d.contacts || []);
       setContactsMeta({ friendsCount: d.friendsCount || 0, groupsCount: d.groupsCount || 0, updatedAt: d.updatedAt });
     } catch { /* noop */ } finally { setFriendsLoading(false); }
-  }, [api, secret]);
+  }, [api, authed]);
 
   const loadSchedules = useCallback(async () => {
-    if (!secret) return;
+    if (!authed) return;
     try {
       const r = await api('/zalo/schedules');
       setSchedules(await r.json());
     } catch { /* noop */ }
-  }, [api, secret]);
+  }, [api, authed]);
 
   useEffect(() => {
-    if (!secret) return;
+    if (!authed) return;
     loadStatus(); loadFriends(); loadSchedules();
     const t = setInterval(loadStatus, 30000); // tự refresh trạng thái mỗi 30s
     return () => clearInterval(t);
-  }, [secret, loadStatus, loadFriends, loadSchedules]);
+  }, [authed, loadStatus, loadFriends, loadSchedules]);
 
   useEffect(() => () => { if (qrTimer.current) clearInterval(qrTimer.current); }, []);
 
@@ -184,16 +195,38 @@ export default function ZaloAdminPage() {
   const filteredContacts = contacts.filter((c) =>
     !friendSearch || (c.name || '').toLowerCase().includes(friendSearch.toLowerCase()));
 
-  // ---- chưa có secret ----
-  if (!secret) {
+  const onGoogleSuccess = (resp) => {
+    const idToken = resp?.credential;
+    if (!idToken) return;
+    localStorage.setItem('google_id_token', idToken);
+    setGToken(idToken);
+  };
+
+  // ---- chưa đăng nhập (chưa có Google hợp lệ và chưa có secret) ----
+  if (!authed) {
     return (
       <div className="max-w-md mx-auto mt-10 bg-white rounded-2xl shadow p-6">
-        <h2 className="text-lg font-bold mb-3">🔐 Quản trị Zalo Bot</h2>
-        <p className="text-sm text-gray-500 mb-3">Nhập mã bí mật (NOTIFY_SECRET) để truy cập.</p>
-        <input className="w-full border rounded-lg px-3 py-2 mb-3" type="password"
-          value={secretInput} onChange={(e) => setSecretInput(e.target.value)} placeholder="NOTIFY_SECRET" />
-        <button className="w-full bg-red-600 text-white rounded-lg py-2 font-semibold hover:bg-red-700"
-          onClick={() => setSecret(secretInput.trim())}>Vào</button>
+        <h2 className="text-lg font-bold mb-1">🔐 Quản trị Zalo Bot</h2>
+        <p className="text-sm text-gray-500 mb-4">Đăng nhập bằng Google để truy cập.</p>
+        <div className="flex justify-center mb-4">
+          <GoogleLogin onSuccess={onGoogleSuccess} onError={() => alert('Đăng nhập Google thất bại')} />
+        </div>
+        {gToken && !gValid && (
+          <p className="text-xs text-amber-600 mb-3 text-center">Phiên Google đã hết hạn — hãy đăng nhập lại.</p>
+        )}
+
+        {!showSecret ? (
+          <button className="w-full text-xs text-gray-400 hover:text-gray-600 mt-2"
+            onClick={() => setShowSecret(true)}>Hoặc dùng mã bí mật (NOTIFY_SECRET)</button>
+        ) : (
+          <div className="border-t pt-4 mt-2">
+            <p className="text-xs text-gray-400 mb-2">Dự phòng khi chưa đăng nhập Google được:</p>
+            <input className="w-full border rounded-lg px-3 py-2 mb-2" type="password"
+              value={secretInput} onChange={(e) => setSecretInput(e.target.value)} placeholder="NOTIFY_SECRET" />
+            <button className="w-full bg-red-600 text-white rounded-lg py-2 font-semibold hover:bg-red-700"
+              onClick={() => setSecret(secretInput.trim())}>Vào bằng mã</button>
+          </div>
+        )}
       </div>
     );
   }
@@ -204,7 +237,11 @@ export default function ZaloAdminPage() {
     <div className="max-w-2xl mx-auto space-y-4 pb-10">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-bold">🤖 Quản trị Zalo Bot</h2>
-        <button className="text-xs text-gray-400 hover:text-red-600" onClick={() => setSecret('')}>Đổi mã</button>
+        <div className="flex items-center gap-2 text-xs text-gray-400">
+          {gValid ? <span className="truncate max-w-[160px]" title={gEmail}>👤 {gEmail}</span> : <span>🔑 mã bí mật</span>}
+          <button className="hover:text-red-600"
+            onClick={() => { setSecret(''); localStorage.removeItem('google_id_token'); setGToken(''); }}>Thoát</button>
+        </div>
       </div>
 
       {/* Trạng thái session */}
@@ -215,7 +252,7 @@ export default function ZaloAdminPage() {
             {loading ? '…' : '↻ Làm mới'}
           </button>
         </div>
-        {statusErr && <div className="text-red-600 text-sm mb-2">⚠️ {statusErr} (kiểm tra lại mã bí mật)</div>}
+        {statusErr && <div className="text-red-600 text-sm mb-2">⚠️ {statusErr}{statusErr.toLowerCase().includes('forbidden') ? ' — tài khoản chưa được cấp quyền' : ''}</div>}
         {status && (
           <>
             <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold mb-3 ${
