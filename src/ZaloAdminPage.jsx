@@ -34,9 +34,9 @@ export default function ZaloAdminPage() {
   const [qrWaiting, setQrWaiting] = useState(false);
   const qrTimer = useRef(null);
 
-  // friends
-  const [friends, setFriends] = useState([]);
-  const [friendsUpdatedAt, setFriendsUpdatedAt] = useState(null);
+  // contacts (friends + groups)
+  const [contacts, setContacts] = useState([]);
+  const [contactsMeta, setContactsMeta] = useState({ friendsCount: 0, groupsCount: 0, updatedAt: null });
   const [friendSearch, setFriendSearch] = useState('');
   const [friendsLoading, setFriendsLoading] = useState(false);
 
@@ -77,8 +77,8 @@ export default function ZaloAdminPage() {
     try {
       const r = await api(`/zalo/friends${refresh ? '?refresh=1' : ''}`);
       const d = await r.json();
-      setFriends(d.friends || []);
-      setFriendsUpdatedAt(d.updatedAt);
+      setContacts(d.contacts || []);
+      setContactsMeta({ friendsCount: d.friendsCount || 0, groupsCount: d.groupsCount || 0, updatedAt: d.updatedAt });
     } catch { /* noop */ } finally { setFriendsLoading(false); }
   }, [api, secret]);
 
@@ -131,12 +131,12 @@ export default function ZaloAdminPage() {
   };
 
   // ---- schedules ----
-  const emptyForm = { targetId: '', targetName: '', message: '', time: '08:00', days: [], enabled: true };
+  const emptyForm = { targetId: '', targetName: '', targetType: 'user', message: '', time: '08:00', days: [], enabled: true };
   const saveForm = async () => {
     if (!form.targetId) return alert('Hãy chọn người nhận');
     if (!form.message.trim()) return alert('Hãy nhập nội dung');
-    const friend = friends.find((f) => f.userId === form.targetId);
-    const body = { ...form, targetName: friend ? friend.name : form.targetName };
+    const contact = contacts.find((c) => c.userId === form.targetId);
+    const body = { ...form, targetName: contact ? contact.name : form.targetName, targetType: form.targetType || 'user' };
     try {
       if (form.id) await api(`/zalo/schedules/${form.id}`, { method: 'PUT', body: JSON.stringify(body) });
       else await api('/zalo/schedules', { method: 'POST', body: JSON.stringify(body) });
@@ -160,8 +160,8 @@ export default function ZaloAdminPage() {
     } catch (e) { alert(e.message); }
   };
 
-  const filteredFriends = friends.filter((f) =>
-    !friendSearch || (f.name || '').toLowerCase().includes(friendSearch.toLowerCase()));
+  const filteredContacts = contacts.filter((c) =>
+    !friendSearch || (c.name || '').toLowerCase().includes(friendSearch.toLowerCase()));
 
   // ---- chưa có secret ----
   if (!secret) {
@@ -248,7 +248,7 @@ export default function ZaloAdminPage() {
                 <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${s.enabled ? 'translate-x-4' : ''}`} />
               </button>
               <div className="flex-1 min-w-0">
-                <div className="font-medium text-gray-800 truncate">{s.targetName || s.targetId}</div>
+                <div className="font-medium text-gray-800 truncate">{s.targetType === 'group' ? '👥 ' : ''}{s.targetName || s.targetId}</div>
                 <div className="text-sm text-gray-500 truncate">{s.message}</div>
                 <div className="text-xs text-gray-400 mt-0.5">
                   🕐 {s.time} · {s.days && s.days.length ? s.days.map((d) => DAY_LABELS[d]).join(', ') : 'Mỗi ngày'}
@@ -256,7 +256,7 @@ export default function ZaloAdminPage() {
                 </div>
               </div>
               <div className="flex flex-col gap-1 flex-shrink-0">
-                <button className="text-xs text-blue-600 hover:underline" onClick={() => setForm({ id: s.id, targetId: s.targetId, targetName: s.targetName, message: s.message, time: s.time, days: s.days || [], enabled: s.enabled })}>Sửa</button>
+                <button className="text-xs text-blue-600 hover:underline" onClick={() => setForm({ id: s.id, targetId: s.targetId, targetName: s.targetName, targetType: s.targetType || 'user', message: s.message, time: s.time, days: s.days || [], enabled: s.enabled })}>Sửa</button>
                 <button className="text-xs text-green-600 hover:underline" onClick={() => sendNow(s)}>Gửi thử</button>
                 <button className="text-xs text-red-500 hover:underline" onClick={() => delSchedule(s)}>Xoá</button>
               </div>
@@ -272,9 +272,12 @@ export default function ZaloAdminPage() {
           <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 z-10 max-h-[90vh] overflow-y-auto">
             <h3 className="font-bold text-lg mb-4">{form.id ? 'Sửa lịch' : 'Thêm lịch hẹn'}</h3>
 
-            <label className="block text-sm font-medium text-gray-600 mb-1">Người nhận</label>
+            <label className="block text-sm font-medium text-gray-600 mb-1">Người nhận / Nhóm</label>
             <div className="flex items-center justify-between mb-1">
-              <span className="text-xs text-gray-400">{friends.length} bạn bè{friendsUpdatedAt ? ` · cập nhật ${timeAgo(friendsUpdatedAt)}` : ''}</span>
+              <span className="text-xs text-gray-400">
+                {contactsMeta.friendsCount} bạn bè · {contactsMeta.groupsCount} nhóm
+                {contactsMeta.updatedAt ? ` · cập nhật ${timeAgo(contactsMeta.updatedAt)}` : ''}
+              </span>
               <button className="text-xs text-blue-600 hover:underline" onClick={() => loadFriends(true)} disabled={friendsLoading}>
                 {friendsLoading ? 'đang tải…' : '↻ Lấy lại từ Zalo'}
               </button>
@@ -283,19 +286,19 @@ export default function ZaloAdminPage() {
               value={friendSearch} onChange={(e) => setFriendSearch(e.target.value)} />
             {form.targetId && !friendSearch && (
               <div className="text-xs text-green-600 mb-2 px-1">
-                ✓ Đã chọn: {friends.find(f => f.userId === form.targetId)?.name || form.targetId}
+                ✓ Đã chọn: {form.targetType === 'group' ? '👥 ' : ''}{contacts.find(c => c.userId === form.targetId)?.name || form.targetId}
               </div>
             )}
             {friendSearch && (
               <div className="border rounded-lg max-h-48 overflow-y-auto mb-4 bg-white shadow-sm">
-                {filteredFriends.length === 0 && (
+                {filteredContacts.length === 0 && (
                   <div className="text-xs text-gray-400 px-3 py-2">Không tìm thấy</div>
                 )}
-                {filteredFriends.map((f) => (
-                  <button key={f.userId} type="button"
-                    className={`w-full text-left px-3 py-2 text-sm hover:bg-red-50 border-b last:border-0 ${form.targetId === f.userId ? 'bg-red-50 text-red-700 font-semibold' : 'text-gray-800'}`}
-                    onClick={() => { setForm((prev) => ({ ...prev, targetId: f.userId, targetName: f.name || '' })); setFriendSearch(''); }}>
-                    {f.name || f.userId}
+                {filteredContacts.map((c) => (
+                  <button key={c.userId} type="button"
+                    className={`w-full text-left px-3 py-2 text-sm hover:bg-red-50 border-b last:border-0 ${form.targetId === c.userId ? 'bg-red-50 text-red-700 font-semibold' : 'text-gray-800'}`}
+                    onClick={() => { setForm((prev) => ({ ...prev, targetId: c.userId, targetName: c.name || '', targetType: c.type || 'user' })); setFriendSearch(''); }}>
+                    {c.type === 'group' ? '👥 ' : ''}{c.name || c.userId}
                   </button>
                 ))}
               </div>
@@ -328,7 +331,7 @@ export default function ZaloAdminPage() {
                 onClick={async () => {
                   if (!form.targetId) return alert('Hãy chọn người nhận trước');
                   if (!form.message.trim()) return alert('Hãy nhập nội dung trước');
-                  const r = await api('/zalo/send', { method: 'POST', body: JSON.stringify({ targetId: form.targetId, message: form.message }) });
+                  const r = await api('/zalo/send', { method: 'POST', body: JSON.stringify({ targetId: form.targetId, message: form.message, targetType: form.targetType || 'user' }) });
                   const d = await r.json();
                   alert(d.ok ? '✅ Đã gửi thử' : '❌ ' + (d.error || 'thất bại'));
                 }}
