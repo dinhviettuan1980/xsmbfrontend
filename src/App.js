@@ -22,6 +22,7 @@ import WeekdayStatsPage from './WeekdayStatsPage';
 import HeadTailPage from './HeadTailPage';
 import AvgCyclePage from './AvgCyclePage';
 import CoOccurrencePage from './CoOccurrencePage';
+import ZaloAdminPage from './ZaloAdminPage';
 import './index.css';
 
 function HeaderSlot() {
@@ -50,6 +51,7 @@ const PAGE_TITLES = {
   '/server-info': 'Server Info',
   '/logs': 'Logs',
   '/logsbydevice': 'Logs by Device',
+  '/zalo-admin': 'Quản trị Zalo Bot',
 };
 
 const NAV_ITEMS = [
@@ -73,6 +75,7 @@ const NAV_ITEMS = [
   { label: '🖥️ Server Info', path: '/server-info' },
   { label: '📋 Logs', path: '/logs' },
   { label: '📱 Logs by Device', path: '/logsbydevice' },
+  { label: '🤖 Quản trị Zalo Bot', path: '/zalo-admin' },
 ];
 
 function SettingsModal({ onClose, musicEnabled, setMusicEnabled }) {
@@ -288,6 +291,7 @@ function AppLayout() {
           <Route path="/server-info" element={<ServerInfo />} />
           <Route path="/logs" element={<Logs />} />
           <Route path="/logsbydevice" element={<LogsByDevicePage />} />
+          <Route path="/zalo-admin" element={<ZaloAdminPage />} />
         </Routes>
       </main>
     </div>
