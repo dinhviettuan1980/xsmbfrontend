@@ -87,17 +87,26 @@ export default function ConvertPage() {
     const mp3Map = {};
     (data.mp3Files || []).forEach(f => { mp3Map[f.name] = f; });
 
-    const rows = (data.sourceFiles || []).map(f => ({
-      key: f.name,
-      srcName: f.name,
-      srcSize: f.size,
-      srcMtime: f.mtime,
-      mp3Name: f.hasMp3 ? f.mp3Name : null,
-      mp3Size: f.hasMp3 ? (mp3Map[f.mp3Name]?.size || null) : null,
-      runningJob: Object.values(data.jobs || {}).find(
-        j => j.filename === f.name && j.status === 'running'
-      ),
-    }));
+    const jobsByFile = {};
+    Object.values(data.jobs || {}).forEach(j => {
+      if (!jobsByFile[j.filename] || j.startedAt > jobsByFile[j.filename].startedAt) {
+        jobsByFile[j.filename] = j;
+      }
+    });
+
+    const rows = (data.sourceFiles || []).map(f => {
+      const latestJob = jobsByFile[f.name];
+      return {
+        key: f.name,
+        srcName: f.name,
+        srcSize: f.size,
+        srcMtime: f.mtime,
+        mp3Name: f.hasMp3 ? f.mp3Name : null,
+        mp3Size: f.hasMp3 ? (mp3Map[f.mp3Name]?.size || null) : null,
+        runningJob: latestJob?.status === 'running' ? latestJob : null,
+        errorJob: latestJob?.status === 'error' ? latestJob : null,
+      };
+    });
 
     // MP3s that have no source file
     const srcNames = new Set((data.sourceFiles || []).map(f => f.mp3Name));
@@ -151,7 +160,7 @@ export default function ConvertPage() {
           <input
             ref={fileInputRef}
             type="file"
-            accept=".pdf,.docx,.txt"
+            accept=".pdf,.docx,.txt,.jpg,.jpeg,.png,.webp,.bmp,.tiff"
             className="w-full text-sm border border-gray-200 rounded-xl px-3 py-2 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-red-50 file:text-red-700"
           />
           <div className="flex gap-2">
@@ -170,7 +179,7 @@ export default function ConvertPage() {
               {uploading ? '...' : '🚀 Upload'}
             </button>
           </div>
-          <p className="text-xs text-gray-400">Không nhập email → thông báo về Telegram</p>
+          <p className="text-xs text-gray-400">Hỗ trợ: PDF, DOCX, TXT, ảnh (JPG/PNG/WEBP) · Không nhập email → thông báo về Telegram</p>
         </form>
       </div>
 
@@ -248,6 +257,15 @@ export default function ConvertPage() {
 
                 {/* Action column */}
                 <div className="flex-shrink-0 flex flex-col items-end gap-1">
+                  {row.srcName && (
+                    <a
+                      href={`${API}/convert/data/${encodeURIComponent(row.srcName)}`}
+                      download
+                      className="text-xs px-2.5 py-1 rounded-lg bg-gray-100 text-gray-600 font-semibold hover:bg-gray-200"
+                    >
+                      ↓ Nguồn
+                    </a>
+                  )}
                   {row.mp3Name && (
                     <a
                       href={`${API}/convert/output/${encodeURIComponent(row.mp3Name)}`}
@@ -261,6 +279,14 @@ export default function ConvertPage() {
                     <span className="text-xs px-2.5 py-1 rounded-lg bg-amber-50 text-amber-600 font-medium">
                       ⏳ Đang xử lý
                     </span>
+                  ) : row.errorJob ? (
+                    <button
+                      onClick={() => startConvert(row.srcName)}
+                      title={row.errorJob.log || 'Lỗi không xác định'}
+                      className="text-xs px-2.5 py-1 rounded-lg bg-red-100 text-red-700 font-semibold hover:bg-red-200"
+                    >
+                      ⚠️ Thử lại
+                    </button>
                   ) : !row.mp3Name && row.srcName ? (
                     <button
                       onClick={() => startConvert(row.srcName)}
