@@ -35,6 +35,14 @@ export default function ConvertPage() {
 
   useEffect(() => { load(); }, []);
 
+  // Auto-reload every 5s while any job is running
+  useEffect(() => {
+    const hasRunning = Object.values(data.jobs || {}).some(j => j.status === 'running');
+    if (!hasRunning) return;
+    const t = setTimeout(load, 5000);
+    return () => clearTimeout(t);
+  }, [data]);
+
   const showToast = (msg, type = 'ok') => {
     setToast({ msg, type });
     setTimeout(() => setToast(null), 4000);
@@ -109,7 +117,7 @@ export default function ConvertPage() {
     }
   };
 
-  // Build unified list: source files + orphan MP3s (no source)
+  // Build unified list: source files + multi-image jobs + orphan MP3s
   const unified = useMemo(() => {
     const mp3Map = {};
     (data.mp3Files || []).forEach(f => { mp3Map[f.name] = f; });
@@ -135,18 +143,48 @@ export default function ConvertPage() {
       };
     });
 
-    // MP3s that have no source file
+    // Multi-image jobs: build a map stem → latest job with sourceImages
+    const multiByOutput = {};
+    Object.values(data.jobs || {}).forEach(j => {
+      if (!j.sourceImages) return;
+      if (!multiByOutput[j.stem] || j.startedAt > multiByOutput[j.stem].startedAt) {
+        multiByOutput[j.stem] = j;
+      }
+    });
+
+    // MP3s that have no source file (includes multi-image output)
     const srcNames = new Set((data.sourceFiles || []).map(f => f.mp3Name));
     (data.mp3Files || []).forEach(f => {
-      if (!srcNames.has(f.name)) {
+      if (srcNames.has(f.name)) return;
+      const stem = f.name.replace(/\.mp3$/i, '');
+      const matchJob = multiByOutput[stem];
+      rows.push({
+        key: f.name,
+        srcName: null,
+        srcSize: null,
+        srcMtime: f.mtime,
+        mp3Name: f.name,
+        mp3Size: f.size,
+        runningJob: null,
+        multiImages: matchJob?.sourceImages || null,
+      });
+      // mark so we don't add a running row for the same stem
+      if (matchJob) delete multiByOutput[stem];
+    });
+
+    // Remaining multi-image jobs still running or errored (MP3 not created yet)
+    Object.values(multiByOutput).forEach(j => {
+      if (j.status === 'running' || j.status === 'error') {
         rows.push({
-          key: f.name,
+          key: `multi_${j.stem}`,
           srcName: null,
           srcSize: null,
-          srcMtime: f.mtime,
-          mp3Name: f.name,
-          mp3Size: f.size,
-          runningJob: null,
+          srcMtime: j.startedAt,
+          mp3Name: null,
+          mp3Size: null,
+          runningJob: j.status === 'running' ? j : null,
+          errorJob: j.status === 'error' ? j : null,
+          multiImages: j.sourceImages,
         });
       }
     });
@@ -290,7 +328,12 @@ export default function ConvertPage() {
               <div key={row.key} className="py-2.5 flex items-start gap-2">
                 {/* File info */}
                 <div className="flex-1 min-w-0 space-y-0.5">
-                  {row.srcName ? (
+                  {row.multiImages ? (
+                    <div className="text-sm font-medium text-gray-700 truncate"
+                      title={row.multiImages.join(', ')}>
+                      🖼️ {row.multiImages.length} ảnh: {row.multiImages.join(', ')}
+                    </div>
+                  ) : row.srcName ? (
                     <div className="text-sm font-medium text-gray-700 truncate" title={row.srcName}>
                       📄 {row.srcName}
                     </div>
@@ -299,7 +342,7 @@ export default function ConvertPage() {
                     <div className="text-sm text-gray-500 truncate" title={row.mp3Name}>
                       🎵 {row.mp3Name}
                     </div>
-                  ) : (
+                  ) : row.runningJob || row.errorJob ? null : (
                     <div className="text-xs text-gray-300 italic">chưa có MP3</div>
                   )}
                   <div className="text-xs text-gray-400">
@@ -315,7 +358,7 @@ export default function ConvertPage() {
 
                 {/* Action column */}
                 <div className="flex-shrink-0 flex flex-col items-end gap-1">
-                  {row.srcName && (
+                  {row.srcName && !row.multiImages && (
                     <a
                       href={`${API}/convert/data/${encodeURIComponent(row.srcName)}`}
                       download
