@@ -13,11 +13,13 @@ export default function ConvertPage() {
   const [data, setData] = useState({ sourceFiles: [], mp3Files: [], jobs: {} });
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadingImages, setUploadingImages] = useState(false);
   const [email, setEmail] = useState('');
   const [toast, setToast] = useState(null);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const fileInputRef = useRef();
+  const imageInputRef = useRef();
 
   const load = async () => {
     setLoading(true);
@@ -60,6 +62,31 @@ export default function ConvertPage() {
       showToast('Lỗi upload: ' + e.message, 'error');
     } finally {
       setUploading(false);
+    }
+  };
+
+  const handleUploadImages = async (e) => {
+    e.preventDefault();
+    const files = imageInputRef.current?.files;
+    if (!files || files.length === 0) return showToast('Chọn ít nhất 1 ảnh', 'error');
+    setUploadingImages(true);
+    const fd = new FormData();
+    Array.from(files).forEach(f => fd.append('files', f));
+    fd.append('email', email);
+    try {
+      const r = await fetch(`${API}/convert/upload-images`, { method: 'POST', body: fd });
+      const res = await r.json();
+      if (res.ok) {
+        showToast(`Đã gửi ${res.count} ảnh — đang OCR và chuyển đổi nền`);
+        imageInputRef.current.value = '';
+        setTimeout(load, 1500);
+      } else {
+        showToast(res.error || 'Lỗi', 'error');
+      }
+    } catch (e) {
+      showToast('Lỗi: ' + e.message, 'error');
+    } finally {
+      setUploadingImages(false);
     }
   };
 
@@ -179,7 +206,38 @@ export default function ConvertPage() {
               {uploading ? '...' : '🚀 Upload'}
             </button>
           </div>
-          <p className="text-xs text-gray-400">Hỗ trợ: PDF, DOCX, TXT, ảnh (JPG/PNG/WEBP) · Không nhập email → thông báo về Telegram</p>
+          <p className="text-xs text-gray-400">Hỗ trợ: PDF, DOCX, TXT, ảnh đơn (JPG/PNG/WEBP) · Không nhập email → thông báo về Telegram</p>
+        </form>
+      </div>
+
+      {/* Multi-image upload */}
+      <div className="bg-white rounded-2xl shadow p-5">
+        <h2 className="font-bold text-gray-800 text-base mb-1">🖼️ Nhiều ảnh → 1 MP3</h2>
+        <p className="text-xs text-gray-400 mb-4">Chọn nhiều ảnh (chụp màn hình, scan...), OCR ghép lại thành 1 file âm thanh</p>
+        <form onSubmit={handleUploadImages} className="space-y-3">
+          <input
+            ref={imageInputRef}
+            type="file"
+            accept=".jpg,.jpeg,.png,.webp,.bmp,.tiff"
+            multiple
+            className="w-full text-sm border border-gray-200 rounded-xl px-3 py-2 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700"
+          />
+          <div className="flex gap-2">
+            <input
+              type="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              placeholder="Email nhận link (tuỳ chọn)"
+              className="flex-1 text-sm border border-gray-200 rounded-xl px-3 py-2 outline-none focus:border-blue-400"
+            />
+            <button
+              type="submit"
+              disabled={uploadingImages}
+              className="px-4 py-2 rounded-xl text-sm font-bold bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 whitespace-nowrap"
+            >
+              {uploadingImages ? '...' : '🖼️ Convert ảnh'}
+            </button>
+          </div>
         </form>
       </div>
 
