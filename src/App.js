@@ -24,6 +24,7 @@ import AvgCyclePage from './AvgCyclePage';
 import CoOccurrencePage from './CoOccurrencePage';
 import ZaloAdminPage from './ZaloAdminPage';
 import GoogleLoginPage from './GoogleLogin';
+import ConvertPage from './ConvertPage';
 import './index.css';
 
 function HeaderSlot() {
@@ -53,6 +54,7 @@ const PAGE_TITLES = {
   '/logs': 'Logs',
   '/logsbydevice': 'Logs by Device',
   '/zalo-admin': 'Quản trị Zalo Bot',
+  '/convert': 'Chuyển văn bản sang MP3',
 };
 
 const NAV_ITEMS = [
@@ -76,7 +78,7 @@ const NAV_ITEMS = [
   { label: '🖥️ Server Info', path: '/server-info' },
   { label: '📋 Logs', path: '/logs' },
   { label: '📱 Logs by Device', path: '/logsbydevice' },
-  { label: '🤖 Quản trị Zalo Bot', path: '/zalo-admin' },
+  { label: '🎵 Chuyển văn bản sang MP3', path: '/convert' },
 ];
 
 function SettingsModal({ onClose, musicEnabled, setMusicEnabled }) {
@@ -117,7 +119,7 @@ function SettingsModal({ onClose, musicEnabled, setMusicEnabled }) {
           </button>
         </div>
 
-        <div className="flex items-center justify-between py-3">
+        <div className="flex items-center justify-between py-3 border-b border-gray-100">
           <div>
             <div className="text-sm font-semibold text-gray-700">Cập nhật kết quả</div>
             <div className="text-xs text-gray-400 mt-0.5">Lấy lại 300 ngày gần nhất</div>
@@ -137,6 +139,34 @@ function SettingsModal({ onClose, musicEnabled, setMusicEnabled }) {
              refreshState === 'error' ? '✗ Lỗi' :
              'Cập nhật'}
           </button>
+        </div>
+
+        <div className="flex items-center justify-between py-3 border-b border-gray-100">
+          <div>
+            <div className="text-sm font-semibold text-gray-700">🤖 Quản trị Zalo Bot</div>
+            <div className="text-xs text-gray-400 mt-0.5">Lịch gửi tin, đăng nhập, lịch sử</div>
+          </div>
+          <Link
+            to="/zalo-admin"
+            onClick={onClose}
+            className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-600 text-white hover:bg-red-700"
+          >
+            Mở
+          </Link>
+        </div>
+
+        <div className="flex items-center justify-between py-3">
+          <div>
+            <div className="text-sm font-semibold text-gray-700">🎵 Chuyển văn bản sang MP3</div>
+            <div className="text-xs text-gray-400 mt-0.5">Upload PDF/DOCX/TXT, nhận link tải MP3</div>
+          </div>
+          <Link
+            to="/convert"
+            onClick={onClose}
+            className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-600 text-white hover:bg-red-700"
+          >
+            Mở
+          </Link>
         </div>
       </div>
     </div>
@@ -294,6 +324,7 @@ function AppLayout() {
           <Route path="/logsbydevice" element={<LogsByDevicePage />} />
           <Route path="/zalo-admin" element={<ZaloAdminPage />} />
           <Route path="/login" element={<GoogleLoginPage />} />
+          <Route path="/convert" element={<ConvertPage />} />
         </Routes>
       </main>
     </div>
