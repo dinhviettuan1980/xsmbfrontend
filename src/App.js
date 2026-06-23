@@ -42,6 +42,7 @@ const PAGE_TITLES = {
   '/weekday-stats': 'Thống kê theo thứ',
   '/bet-sim': 'Giả lập đánh 3 số đầu',
   '/bet-sim-2': 'Giả lập đánh 2 số đầu',
+  '/bet-sim-4': 'Giả lập đánh 4 số đầu',
   '/head-tail': 'Đầu đuôi nóng lạnh',
   '/avg-cycle': 'Chu kỳ trung bình',
   '/co-occurrence': 'Số về cùng nhau',
@@ -65,6 +66,7 @@ const NAV_ITEMS = [
   { label: '📆 Thống kê theo thứ', path: '/weekday-stats' },
   { label: '🎲 Giả lập đánh 3 số đầu', path: '/bet-sim' },
   { label: '🎲 Giả lập đánh 2 số đầu', path: '/bet-sim-2' },
+  { label: '🎲 Giả lập đánh 4 số đầu', path: '/bet-sim-4' },
   { label: '📊 Thống kê lô theo số', path: '/statistic' },
   { label: '🧪 Tổ hợp đề 5 số', path: '/combination-advanced' },
   { label: '🎯 Sinh tổ hợp nhóm', path: '/generate-combinations' },
@@ -315,6 +317,7 @@ function AppLayout() {
           <Route path="/weekday-stats" element={<WeekdayStatsPage />} />
           <Route path="/bet-sim" element={<BetSimPage apiPrefix="/api/sim" soCount={3} stakePerDay={337.5} />} />
           <Route path="/bet-sim-2" element={<BetSimPage apiPrefix="/api/sim2" soCount={2} stakePerDay={225} />} />
+          <Route path="/bet-sim-4" element={<BetSimPage apiPrefix="/api/sim4" soCount={4} stakePerDay={450} />} />
           <Route path="/head-tail" element={<HeadTailPage />} />
           <Route path="/avg-cycle" element={<AvgCyclePage />} />
           <Route path="/co-occurrence" element={<CoOccurrencePage />} />
