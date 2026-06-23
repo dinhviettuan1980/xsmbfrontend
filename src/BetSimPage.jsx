@@ -42,7 +42,7 @@ export default function BetSimPage() {
     }
   };
 
-  useEffect(() => { fetchData(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { fetchData(); }, []);
 
   // Lãi/lỗ luỹ kế theo thời gian (cũ → mới), gắn vào từng dòng để hiển thị
   const rows = (() => {
