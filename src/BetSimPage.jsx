@@ -132,7 +132,7 @@ export default function BetSimPage() {
           </tr>
         </thead>
         <tbody>
-          {days.map((b) => {
+          {[...days].reverse().map((b) => {
             const isToday = b.bet_date === todayVN;
             return (
               <tr key={b.id || b.bet_date} className={isToday ? 'bg-amber-50' : 'odd:bg-white even:bg-gray-50'}>
