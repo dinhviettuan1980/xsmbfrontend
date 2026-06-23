@@ -35,7 +35,7 @@ function fmtKplain(v) {
 const profitColor = (v) =>
   v == null ? 'text-gray-400' : v > 0 ? 'text-green-600' : v < 0 ? 'text-red-600' : 'text-gray-600';
 
-export default function BetSimPage() {
+export default function BetSimPage({ apiPrefix = '/api/sim', soCount = 3, stakePerDay = 337.5 }) {
   const [summary, setSummary] = useState(null);
   const [bets, setBets] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -48,8 +48,8 @@ export default function BetSimPage() {
     setLoading(true);
     try {
       const [sumRes, betsRes] = await Promise.all([
-        apiClient.get(`${baseUrl}/api/sim/summary`),
-        apiClient.get(`${baseUrl}/api/sim/bets`, { params: { limit: 1000 } }),
+        apiClient.get(`${baseUrl}${apiPrefix}/summary`),
+        apiClient.get(`${baseUrl}${apiPrefix}/bets`, { params: { limit: 1000 } }),
       ]);
       setSummary(sumRes.data);
       setBets(betsRes.data || []);
@@ -60,7 +60,7 @@ export default function BetSimPage() {
     }
   };
 
-  useEffect(() => { fetchData(); }, []);
+  useEffect(() => { fetchData(); }, [apiPrefix]);
 
   // Gom các kỳ thành tuần (Thứ 2 → CN), tính luỹ kế trong tuần & luỹ kế qua các tuần
   const weeks = useMemo(() => {
@@ -174,12 +174,12 @@ export default function BetSimPage() {
 
   return (
     <div>
-      <Helmet><title>Giả lập đánh 3 số đầu - XSMB</title></Helmet>
+      <Helmet><title>Giả lập đánh {soCount} số đầu - XSMB</title></Helmet>
 
       <div className="flex items-start justify-between mb-4 gap-2">
         <div>
-          <h1 className="text-lg font-bold text-gray-800">🎲 Giả lập đánh "3 số đầu" theo thứ</h1>
-          <p className="text-xs text-gray-500 mt-0.5">Mỗi ngày 3 số · 5 điểm/số · 1 điểm 22.5k · ăn 80k/điểm/nháy · đánh 337.5k/ngày · tổng kết theo tuần (T2→CN)</p>
+          <h1 className="text-lg font-bold text-gray-800">🎲 Giả lập đánh "{soCount} số đầu" theo thứ</h1>
+          <p className="text-xs text-gray-500 mt-0.5">Mỗi ngày {soCount} số · 5 điểm/số · 1 điểm 22.5k · ăn 80k/điểm/nháy · đánh {stakePerDay}k/ngày · tổng kết theo tuần (T2→CN)</p>
         </div>
         <button onClick={fetchData} className="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-sm font-semibold transition-colors flex-shrink-0">↻</button>
       </div>
