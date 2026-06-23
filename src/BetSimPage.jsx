@@ -174,7 +174,7 @@ export default function BetSimPage({ apiPrefix = '/api/sim', soCount = 3, stakeP
 
   return (
     <div>
-      <Helmet><title>Giả lập đánh {soCount} số đầu - XSMB</title></Helmet>
+      <Helmet><title>{`Giả lập đánh ${soCount} số đầu - XSMB`}</title></Helmet>
 
       <div className="flex items-start justify-between mb-4 gap-2">
         <div>
