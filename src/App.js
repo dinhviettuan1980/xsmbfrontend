@@ -19,6 +19,7 @@ import MaxAbsentStatsPage from './MaxAbsentStatsPage';
 import NumerologyPage from './NumerologyPage';
 import TarotPage from './TarotPage';
 import WeekdayStatsPage from './WeekdayStatsPage';
+import BetSimPage from './BetSimPage';
 import HeadTailPage from './HeadTailPage';
 import AvgCyclePage from './AvgCyclePage';
 import CoOccurrencePage from './CoOccurrencePage';
@@ -39,6 +40,7 @@ const PAGE_TITLES = {
   '/longest-absent': 'Số lâu vắng mặt',
   '/max-absent-stats': 'Ngày vắng cực đại',
   '/weekday-stats': 'Thống kê theo thứ',
+  '/bet-sim': 'Giả lập đánh 3 số đầu',
   '/head-tail': 'Đầu đuôi nóng lạnh',
   '/avg-cycle': 'Chu kỳ trung bình',
   '/co-occurrence': 'Số về cùng nhau',
@@ -60,6 +62,7 @@ const PAGE_TITLES = {
 const NAV_ITEMS = [
   { label: '🏠 Trang chủ', path: '/' },
   { label: '📆 Thống kê theo thứ', path: '/weekday-stats' },
+  { label: '🎲 Giả lập đánh 3 số đầu', path: '/bet-sim' },
   { label: '📊 Thống kê lô theo số', path: '/statistic' },
   { label: '🧪 Tổ hợp đề 5 số', path: '/combination-advanced' },
   { label: '🎯 Sinh tổ hợp nhóm', path: '/generate-combinations' },
@@ -308,6 +311,7 @@ function AppLayout() {
           <Route path="/longest-absent" element={<LongestAbsentPage />} />
           <Route path="/max-absent-stats" element={<MaxAbsentStatsPage />} />
           <Route path="/weekday-stats" element={<WeekdayStatsPage />} />
+          <Route path="/bet-sim" element={<BetSimPage />} />
           <Route path="/head-tail" element={<HeadTailPage />} />
           <Route path="/avg-cycle" element={<AvgCyclePage />} />
           <Route path="/co-occurrence" element={<CoOccurrencePage />} />
