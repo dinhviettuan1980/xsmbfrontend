@@ -236,6 +236,8 @@ export default function BetSimPage() {
   const fetchData = async () => {
     setLoading(true);
     try {
+      // Chốt ngay các kỳ đã đủ kết quả (không chờ cron 19h), rồi mới lấy dữ liệu
+      await Promise.all(VARIANTS.map((v) => apiClient.post(`${baseUrl}${v.apiPrefix}/settle`).catch(() => {})));
       const results = await Promise.all(
         VARIANTS.map((v) => apiClient.get(`${baseUrl}${v.apiPrefix}/bets`, { params: { limit: 2000 } }))
       );
