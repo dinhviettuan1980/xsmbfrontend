@@ -49,7 +49,8 @@ export default function ZaloAdminPage() {
 
   // schedules
   const [schedules, setSchedules] = useState([]);
-  const [form, setForm] = useState(null); // {id?, targetId, message, time, days[], enabled, isSpecial?}
+  const [paused, setPaused] = useState(false);
+  const [form, setForm] = useState(null); // {id?, targetId, message, time, days[], enabled, isSpecial?, targets?[]}
 
   // history popup
   const [historyFor, setHistoryFor] = useState(null); // {targetId, targetName}
@@ -106,12 +107,25 @@ export default function ZaloAdminPage() {
     } catch { /* noop */ }
   }, [api, authed]);
 
+  const loadPause = useCallback(async () => {
+    if (!authed) return;
+    try { const r = await api('/zalo/pause'); const d = await r.json(); setPaused(!!d.paused); } catch { /* noop */ }
+  }, [api, authed]);
+
+  const togglePause = async () => {
+    try {
+      const r = await api('/zalo/pause', { method: 'POST', body: JSON.stringify({ paused: !paused }) });
+      const d = await r.json();
+      setPaused(!!d.paused);
+    } catch (e) { alert(e.message); }
+  };
+
   useEffect(() => {
     if (!authed) return;
-    loadStatus(); loadFriends(); loadSchedules();
+    loadStatus(); loadFriends(); loadSchedules(); loadPause();
     const t = setInterval(loadStatus, 30000); // tự refresh trạng thái mỗi 30s
     return () => clearInterval(t);
-  }, [authed, loadStatus, loadFriends, loadSchedules]);
+  }, [authed, loadStatus, loadFriends, loadSchedules, loadPause]);
 
   useEffect(() => () => { if (qrTimer.current) clearInterval(qrTimer.current); }, []);
 
@@ -147,8 +161,20 @@ export default function ZaloAdminPage() {
   };
 
   // ---- schedules ----
-  const emptyForm = { targetId: '', targetName: '', targetType: 'user', message: '', time: '08:00', days: [], enabled: true, isSpecial: false };
+  const emptyForm = { targetId: '', targetName: '', targetType: 'user', message: '', time: '08:00', days: [], enabled: true, isSpecial: false, targets: [] };
   const saveForm = async () => {
+    const multi = form.isSpecial && !form.id; // thêm lịch đặc biệt: chọn nhiều người
+    if (multi) {
+      const targets = form.targets || [];
+      if (!targets.length) return alert('Hãy chọn ít nhất 1 người/nhóm nhận');
+      try {
+        for (const t of targets) {
+          await api('/zalo/schedules', { method: 'POST', body: JSON.stringify({ targetId: t.userId, targetName: t.name, targetType: t.type, isSpecial: true, time: form.time, days: form.days, enabled: form.enabled }) });
+        }
+        setForm(null); loadSchedules();
+      } catch (e) { alert('Lỗi lưu lịch: ' + e.message); }
+      return;
+    }
     if (!form.targetId) return alert('Hãy chọn người nhận');
     if (!form.isSpecial && !form.message.trim()) return alert('Hãy nhập nội dung');
     const contact = contacts.find((c) => c.userId === form.targetId);
@@ -292,15 +318,23 @@ export default function ZaloAdminPage() {
 
       {/* Lịch hẹn gửi tin */}
       <div className="bg-white rounded-2xl shadow p-5">
-        <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
           <h3 className="font-semibold text-gray-700">Lịch hẹn gửi tin</h3>
           <div className="flex gap-2">
+            <button className={`px-3 py-1.5 rounded-lg text-sm font-medium ${paused ? 'bg-green-600 text-white hover:bg-green-700' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+              onClick={togglePause}>{paused ? '▶ Tiếp tục' : '⏸ Tạm dừng'}</button>
             <button className="px-3 py-1.5 rounded-lg bg-amber-500 text-white text-sm font-medium hover:bg-amber-600"
-              onClick={() => setForm({ ...emptyForm, isSpecial: true, time: '17:00' })}>✦ 3 số đầu</button>
+              onClick={() => setForm({ ...emptyForm, isSpecial: true, time: '17:00', targets: [] })}>✦ 3 số đầu</button>
             <button className="px-3 py-1.5 rounded-lg bg-red-600 text-white text-sm font-medium hover:bg-red-700"
               onClick={() => setForm({ ...emptyForm })}>+ Thêm lịch</button>
           </div>
         </div>
+
+        {paused && (
+          <div className="mb-3 text-sm bg-amber-100 text-amber-800 rounded-lg px-3 py-2">
+            ⏸ Đang tạm dừng — bot sẽ <b>không gửi</b> bất kỳ tin hẹn nào cho tới khi bấm <b>Tiếp tục</b>.
+          </div>
+        )}
 
         {schedules.length === 0 && <p className="text-sm text-gray-400">Chưa có lịch nào.</p>}
         <div className="space-y-2">
@@ -324,7 +358,7 @@ export default function ZaloAdminPage() {
               <div className="flex flex-col gap-1 flex-shrink-0">
                 <button className="text-xs text-blue-600 hover:underline" onClick={() => setForm({ id: s.id, targetId: s.targetId, targetName: s.targetName, targetType: s.targetType || 'user', message: s.message, time: s.time, days: s.days || [], enabled: s.enabled, isSpecial: s.isSpecial })}>Sửa</button>
                 <button className="text-xs text-green-600 hover:underline" onClick={() => sendNow(s)}>Gửi thử</button>
-                {!s.isSpecial && <button className="text-xs text-red-500 hover:underline" onClick={() => delSchedule(s)}>Xoá</button>}
+                <button className="text-xs text-red-500 hover:underline" onClick={() => delSchedule(s)}>Xoá</button>
               </div>
             </div>
           ))}
@@ -344,20 +378,57 @@ export default function ZaloAdminPage() {
               ✦ Lịch đặc biệt — tự gửi Top 3 số đầu theo thứ
             </label>
 
-            <label className="block text-sm font-medium text-gray-600 mb-1">Người nhận / Nhóm</label>
-            {(
+            <label className="block text-sm font-medium text-gray-600 mb-1">
+              Người nhận / Nhóm{form.isSpecial && !form.id ? ' — chọn nhiều' : ''}
+            </label>
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-xs text-gray-400">
+                {contactsMeta.friendsCount} bạn bè · {contactsMeta.groupsCount} nhóm
+                {contactsMeta.updatedAt ? ` · cập nhật ${timeAgo(contactsMeta.updatedAt)}` : ''}
+              </span>
+              <button className="text-xs text-blue-600 hover:underline" onClick={() => loadFriends(true)} disabled={friendsLoading}>
+                {friendsLoading ? 'đang tải…' : '↻ Lấy lại từ Zalo'}
+              </button>
+            </div>
+            <input className="w-full border rounded-lg px-3 py-2 mb-1 text-sm" placeholder="Tìm theo tên…"
+              value={friendSearch} onChange={(e) => setFriendSearch(e.target.value)} />
+
+            {form.isSpecial && !form.id ? (
               <>
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs text-gray-400">
-                    {contactsMeta.friendsCount} bạn bè · {contactsMeta.groupsCount} nhóm
-                    {contactsMeta.updatedAt ? ` · cập nhật ${timeAgo(contactsMeta.updatedAt)}` : ''}
-                  </span>
-                  <button className="text-xs text-blue-600 hover:underline" onClick={() => loadFriends(true)} disabled={friendsLoading}>
-                    {friendsLoading ? 'đang tải…' : '↻ Lấy lại từ Zalo'}
-                  </button>
+                {(form.targets || []).length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 my-2">
+                    {form.targets.map((t) => (
+                      <span key={t.userId} className="inline-flex items-center gap-1 bg-red-50 text-red-700 text-xs rounded-full pl-2 pr-1 py-0.5">
+                        {t.type === 'group' ? '👥 ' : ''}{t.name || t.userId}
+                        <button type="button" className="hover:text-red-900 font-bold"
+                          onClick={() => setForm((f) => ({ ...f, targets: f.targets.filter((x) => x.userId !== t.userId) }))}>×</button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+                <div className="border rounded-lg max-h-48 overflow-y-auto mb-4 bg-white shadow-sm">
+                  {filteredContacts.length === 0 && (
+                    <div className="text-xs text-gray-400 px-3 py-2">Không có liên hệ</div>
+                  )}
+                  {filteredContacts.map((c) => {
+                    const on = (form.targets || []).some((t) => t.userId === c.userId);
+                    return (
+                      <button key={c.userId} type="button"
+                        className={`w-full text-left px-3 py-2 text-sm hover:bg-red-50 border-b last:border-0 flex items-center gap-2 ${on ? 'bg-red-50 text-red-700 font-semibold' : 'text-gray-800'}`}
+                        onClick={() => setForm((f) => {
+                          const cur = f.targets || [];
+                          const has = cur.some((t) => t.userId === c.userId);
+                          return { ...f, targets: has ? cur.filter((t) => t.userId !== c.userId) : [...cur, { userId: c.userId, name: c.name || '', type: c.type || 'user' }] };
+                        })}>
+                        <span className={`w-4 ${on ? 'text-red-600' : 'text-gray-300'}`}>{on ? '✓' : '＋'}</span>
+                        {c.type === 'group' ? '👥 ' : ''}{c.name || c.userId}
+                      </button>
+                    );
+                  })}
                 </div>
-                <input className="w-full border rounded-lg px-3 py-2 mb-1 text-sm" placeholder="Tìm theo tên…"
-                  value={friendSearch} onChange={(e) => setFriendSearch(e.target.value)} />
+              </>
+            ) : (
+              <>
                 {form.targetId && !friendSearch && (
                   <div className="text-xs text-green-600 mb-2 px-1">
                     ✓ Đã chọn: {form.targetType === 'group' ? '👥 ' : ''}{contacts.find(c => c.userId === form.targetId)?.name || form.targetId}
@@ -407,23 +478,25 @@ export default function ZaloAdminPage() {
 
             <div className="flex gap-2 justify-end">
               <button className="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-sm" onClick={() => setForm(null)}>Huỷ</button>
-              <button
-                className="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 text-sm font-semibold"
-                onClick={async () => {
-                  if (!form.targetId) return alert('Hãy chọn người nhận trước');
-                  if (form.isSpecial) {
-                    if (!form.id) return alert('Lưu lịch trước rồi mới gửi thử được');
-                    const r = await api(`/zalo/schedules/${form.id}/test`, { method: 'POST' });
-                    const d = await r.json();
-                    alert(d.ok ? `✅ Đã gửi thử: "${d.message}"` : '❌ ' + (d.error || 'thất bại'));
-                  } else {
-                    if (!form.message.trim()) return alert('Hãy nhập nội dung trước');
-                    const r = await api('/zalo/send', { method: 'POST', body: JSON.stringify({ targetId: form.targetId, message: form.message, targetType: form.targetType || 'user' }) });
-                    const d = await r.json();
-                    alert(d.ok ? '✅ Đã gửi thử' : '❌ ' + (d.error || 'thất bại'));
-                  }
-                }}
-              >Gửi thử</button>
+              {!(form.isSpecial && !form.id) && (
+                <button
+                  className="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 text-sm font-semibold"
+                  onClick={async () => {
+                    if (!form.targetId) return alert('Hãy chọn người nhận trước');
+                    if (form.isSpecial) {
+                      if (!form.id) return alert('Lưu lịch trước rồi mới gửi thử được');
+                      const r = await api(`/zalo/schedules/${form.id}/test`, { method: 'POST' });
+                      const d = await r.json();
+                      alert(d.ok ? `✅ Đã gửi thử: "${d.message}"` : '❌ ' + (d.error || 'thất bại'));
+                    } else {
+                      if (!form.message.trim()) return alert('Hãy nhập nội dung trước');
+                      const r = await api('/zalo/send', { method: 'POST', body: JSON.stringify({ targetId: form.targetId, message: form.message, targetType: form.targetType || 'user' }) });
+                      const d = await r.json();
+                      alert(d.ok ? '✅ Đã gửi thử' : '❌ ' + (d.error || 'thất bại'));
+                    }
+                  }}
+                >Gửi thử</button>
+              )}
               <button className="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 text-sm font-semibold" onClick={saveForm}>Lưu</button>
             </div>
           </div>
