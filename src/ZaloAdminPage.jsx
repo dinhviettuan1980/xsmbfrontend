@@ -49,7 +49,6 @@ export default function ZaloAdminPage() {
 
   // schedules
   const [schedules, setSchedules] = useState([]);
-  const [paused, setPaused] = useState(false);
   const [form, setForm] = useState(null); // {id?, targetId, message, time, days[], enabled, isSpecial?, targets?[]}
 
   // history popup
@@ -107,25 +106,12 @@ export default function ZaloAdminPage() {
     } catch { /* noop */ }
   }, [api, authed]);
 
-  const loadPause = useCallback(async () => {
-    if (!authed) return;
-    try { const r = await api('/zalo/pause'); const d = await r.json(); setPaused(!!d.paused); } catch { /* noop */ }
-  }, [api, authed]);
-
-  const togglePause = async () => {
-    try {
-      const r = await api('/zalo/pause', { method: 'POST', body: JSON.stringify({ paused: !paused }) });
-      const d = await r.json();
-      setPaused(!!d.paused);
-    } catch (e) { alert(e.message); }
-  };
-
   useEffect(() => {
     if (!authed) return;
-    loadStatus(); loadFriends(); loadSchedules(); loadPause();
+    loadStatus(); loadFriends(); loadSchedules();
     const t = setInterval(loadStatus, 30000); // tự refresh trạng thái mỗi 30s
     return () => clearInterval(t);
-  }, [authed, loadStatus, loadFriends, loadSchedules, loadPause]);
+  }, [authed, loadStatus, loadFriends, loadSchedules]);
 
   useEffect(() => () => { if (qrTimer.current) clearInterval(qrTimer.current); }, []);
 
@@ -321,8 +307,6 @@ export default function ZaloAdminPage() {
         <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
           <h3 className="font-semibold text-gray-700">Lịch hẹn gửi tin</h3>
           <div className="flex gap-2">
-            <button className={`px-3 py-1.5 rounded-lg text-sm font-medium ${paused ? 'bg-green-600 text-white hover:bg-green-700' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
-              onClick={togglePause}>{paused ? '▶ Tiếp tục' : '⏸ Tạm dừng'}</button>
             <button className="px-3 py-1.5 rounded-lg bg-amber-500 text-white text-sm font-medium hover:bg-amber-600"
               onClick={() => setForm({ ...emptyForm, isSpecial: true, time: '17:00', targets: [] })}>✦ 3 số đầu</button>
             <button className="px-3 py-1.5 rounded-lg bg-red-600 text-white text-sm font-medium hover:bg-red-700"
@@ -330,19 +314,20 @@ export default function ZaloAdminPage() {
           </div>
         </div>
 
-        {paused && (
-          <div className="mb-3 text-sm bg-amber-100 text-amber-800 rounded-lg px-3 py-2">
-            ⏸ Đang tạm dừng — bot sẽ <b>không gửi</b> bất kỳ tin hẹn nào cho tới khi bấm <b>Tiếp tục</b>.
-          </div>
-        )}
+        <p className="text-xs text-gray-400 mb-3">Mỗi tin có công tắc riêng — gạt tắt để <b>tạm dừng</b> đúng tin đó, gạt bật để gửi lại.</p>
 
         {schedules.length === 0 && <p className="text-sm text-gray-400">Chưa có lịch nào.</p>}
         <div className="space-y-2">
           {schedules.map((s) => (
-            <div key={s.id} className={`flex items-center gap-3 border rounded-xl p-3 ${s.isSpecial ? 'border-amber-300 bg-amber-50' : ''}`}>
-              <button onClick={() => toggleEnabled(s)} className={`w-10 h-6 rounded-full flex-shrink-0 relative ${s.enabled ? 'bg-green-500' : 'bg-gray-300'}`}>
-                <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${s.enabled ? 'translate-x-4' : ''}`} />
-              </button>
+            <div key={s.id} className={`flex items-center gap-3 border rounded-xl p-3 ${s.isSpecial ? 'border-amber-300 bg-amber-50' : ''} ${!s.enabled ? 'opacity-60' : ''}`}>
+              <div className="flex flex-col items-center gap-0.5 flex-shrink-0">
+                <button onClick={() => toggleEnabled(s)}
+                  title={s.enabled ? 'Đang gửi — bấm để tạm dừng tin này' : 'Đang tạm dừng — bấm để gửi lại'}
+                  className={`w-10 h-6 rounded-full relative ${s.enabled ? 'bg-green-500' : 'bg-gray-300'}`}>
+                  <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${s.enabled ? 'translate-x-4' : ''}`} />
+                </button>
+                <span className={`text-[9px] font-semibold ${s.enabled ? 'text-green-600' : 'text-gray-400'}`}>{s.enabled ? 'đang gửi' : 'tạm dừng'}</span>
+              </div>
               <div className="flex-1 min-w-0 cursor-pointer" onClick={() => { const name = s.targetName || contacts.find(c => c.userId === s.targetId)?.name || s.targetId; setHistoryFor({ targetId: s.targetId, targetName: name }); loadHistory(s.targetId); }}>
                 <div className="font-medium text-gray-800 truncate">
                   {s.isSpecial && <span className="text-amber-600 text-xs font-bold mr-1">✦ ĐẶC BIỆT</span>}
