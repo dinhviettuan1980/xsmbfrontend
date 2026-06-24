@@ -147,10 +147,10 @@ export default function ZaloAdminPage() {
   };
 
   // ---- schedules ----
-  const emptyForm = { targetId: '', targetName: '', targetType: 'user', message: '', time: '08:00', days: [], enabled: true };
+  const emptyForm = { targetId: '', targetName: '', targetType: 'user', message: '', time: '08:00', days: [], enabled: true, isSpecial: false };
   const saveForm = async () => {
     if (!form.targetId) return alert('Hãy chọn người nhận');
-    if (!form.message.trim()) return alert('Hãy nhập nội dung');
+    if (!form.isSpecial && !form.message.trim()) return alert('Hãy nhập nội dung');
     const contact = contacts.find((c) => c.userId === form.targetId);
     const body = { ...form, targetName: contact ? contact.name : form.targetName, targetType: form.targetType || 'user' };
     try {
@@ -294,8 +294,12 @@ export default function ZaloAdminPage() {
       <div className="bg-white rounded-2xl shadow p-5">
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-semibold text-gray-700">Lịch hẹn gửi tin</h3>
-          <button className="px-3 py-1.5 rounded-lg bg-red-600 text-white text-sm font-medium hover:bg-red-700"
-            onClick={() => setForm({ ...emptyForm })}>+ Thêm lịch</button>
+          <div className="flex gap-2">
+            <button className="px-3 py-1.5 rounded-lg bg-amber-500 text-white text-sm font-medium hover:bg-amber-600"
+              onClick={() => setForm({ ...emptyForm, isSpecial: true, time: '17:00' })}>✦ 3 số đầu</button>
+            <button className="px-3 py-1.5 rounded-lg bg-red-600 text-white text-sm font-medium hover:bg-red-700"
+              onClick={() => setForm({ ...emptyForm })}>+ Thêm lịch</button>
+          </div>
         </div>
 
         {schedules.length === 0 && <p className="text-sm text-gray-400">Chưa có lịch nào.</p>}
@@ -332,14 +336,16 @@ export default function ZaloAdminPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/50" onClick={() => setForm(null)} />
           <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 z-10 max-h-[90vh] overflow-y-auto">
-            <h3 className="font-bold text-lg mb-4">{form.id ? 'Sửa lịch' : 'Thêm lịch hẹn'}</h3>
+            <h3 className="font-bold text-lg mb-4">{form.id ? 'Sửa lịch' : (form.isSpecial ? 'Thêm người gửi 3 số đầu' : 'Thêm lịch hẹn')}</h3>
+
+            <label className="flex items-center gap-2 mb-4 text-sm font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 cursor-pointer">
+              <input type="checkbox" checked={!!form.isSpecial}
+                onChange={(e) => setForm((f) => ({ ...f, isSpecial: e.target.checked, time: e.target.checked && (f.time === '08:00' || !f.time) ? '17:00' : f.time }))} />
+              ✦ Lịch đặc biệt — tự gửi Top 3 số đầu theo thứ
+            </label>
 
             <label className="block text-sm font-medium text-gray-600 mb-1">Người nhận / Nhóm</label>
-            {form.isSpecial ? (
-              <div className="border border-amber-200 bg-amber-50 rounded-lg px-3 py-2 mb-4 text-sm text-amber-700">
-                🔒 {form.targetName || form.targetId} (cố định)
-              </div>
-            ) : (
+            {(
               <>
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-xs text-gray-400">
@@ -377,7 +383,7 @@ export default function ZaloAdminPage() {
             <label className="block text-sm font-medium text-gray-600 mb-1">Nội dung tin nhắn</label>
             {form.isSpecial ? (
               <div className="w-full border border-amber-200 bg-amber-50 rounded-lg px-3 py-2 mb-4 text-sm text-amber-700">
-                🔒 secret — tự động: Top 3 số hay về theo thứ hôm nay, gửi lúc 17:00
+                ✦ Tự động: nội dung là Top 3 số hay về theo thứ trong ngày — gửi dạng "Lô a,b,c x 5n"
               </div>
             ) : (
               <textarea className="w-full border rounded-lg px-3 py-2 mb-4 text-sm" rows={3}
@@ -385,12 +391,8 @@ export default function ZaloAdminPage() {
             )}
 
             <label className="block text-sm font-medium text-gray-600 mb-1">Giờ gửi (giờ VN)</label>
-            {form.isSpecial ? (
-              <div className="border border-amber-200 bg-amber-50 rounded-lg px-3 py-2 mb-4 text-sm text-amber-700 inline-block">🔒 17:00 (cố định)</div>
-            ) : (
-              <input type="time" className="border rounded-lg px-3 py-2 mb-4 text-sm" value={form.time}
-                onChange={(e) => setForm((f) => ({ ...f, time: e.target.value }))} />
-            )}
+            <input type="time" className="border rounded-lg px-3 py-2 mb-4 text-sm" value={form.time}
+              onChange={(e) => setForm((f) => ({ ...f, time: e.target.value }))} />
 
             <label className="block text-sm font-medium text-gray-600 mb-1">Ngày trong tuần (bỏ trống = mỗi ngày)</label>
             <div className="flex gap-1.5 mb-5 flex-wrap">
