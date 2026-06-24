@@ -318,7 +318,7 @@ export default function ZaloAdminPage() {
 
         {schedules.length === 0 && <p className="text-sm text-gray-400">Chưa có lịch nào.</p>}
         <div className="space-y-2">
-          {schedules.map((s) => (
+          {[...schedules].sort((a, b) => (b.isSpecial ? 1 : 0) - (a.isSpecial ? 1 : 0)).map((s) => (
             <div key={s.id} className={`flex items-center gap-3 border rounded-xl p-3 ${s.isSpecial ? 'border-amber-300 bg-amber-50' : ''} ${!s.enabled ? 'opacity-60' : ''}`}>
               <div className="flex flex-col items-center gap-0.5 flex-shrink-0">
                 <button onClick={() => toggleEnabled(s)}
