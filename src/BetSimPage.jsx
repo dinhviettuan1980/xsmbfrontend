@@ -8,6 +8,7 @@ const VARIANTS = [
   { key: 4, apiPrefix: '/api/sim4', label: '4 số', stakePerDay: 450 },
 ];
 const MIN_DATE = '2026-01-01';
+const START_REAL = '2026-06-24'; // ngày bắt đầu đánh thật — mốc thống kê mặc định, cố định
 const VN_DAYS = ['', '', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
 
 function todayVNStr() {
@@ -225,7 +226,7 @@ function WeeklyDetail({ weeks, todayVN, expanded, toggle }) {
 export default function BetSimPage() {
   const todayVN = todayVNStr();
   const [data, setData] = useState({ 2: [], 3: [], 4: [] });
-  const [startDate, setStartDate] = useState(todayVN);
+  const [startDate, setStartDate] = useState(START_REAL);
   const [activeTab, setActiveTab] = useState(3);
   const [loading, setLoading] = useState(false);
   const [expanded, setExpanded] = useState(new Set());
@@ -291,8 +292,8 @@ export default function BetSimPage() {
           onChange={(e) => setStartDate(e.target.value < MIN_DATE ? MIN_DATE : e.target.value)}
           className="border border-gray-200 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 bg-white"
         />
+        <button onClick={() => setStartDate(START_REAL)} className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold ${startDate === START_REAL ? 'bg-red-600 text-white' : 'bg-white border border-gray-200 text-gray-600'}`}>Từ 24/6</button>
         <button onClick={() => setStartDate(todayVN)} className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold ${startDate === todayVN ? 'bg-red-600 text-white' : 'bg-white border border-gray-200 text-gray-600'}`}>Hôm nay</button>
-        <button onClick={() => setStartDate('2026-06-01')} className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold ${startDate === '2026-06-01' ? 'bg-red-600 text-white' : 'bg-white border border-gray-200 text-gray-600'}`}>Từ 1/6</button>
         <button onClick={() => setStartDate(MIN_DATE)} className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold ${startDate === MIN_DATE ? 'bg-red-600 text-white' : 'bg-white border border-gray-200 text-gray-600'}`}>Đầu năm</button>
         <button onClick={fetchData} className="ml-auto bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-lg text-sm font-semibold transition-colors">↻</button>
       </div>
