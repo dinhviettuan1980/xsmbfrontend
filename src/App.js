@@ -179,7 +179,7 @@ function SettingsModal({ onClose, musicEnabled, setMusicEnabled }) {
 function AppLayout() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [musicEnabled, setMusicEnabled] = useState(true);
+  const [musicEnabled, setMusicEnabled] = useState(false);
   const audioRef = useRef(null);
   const location = useLocation();
   const pageTitle = PAGE_TITLES[location.pathname] || 'XSMB';
