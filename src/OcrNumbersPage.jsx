@@ -49,6 +49,7 @@ export default function OcrNumbersPage() {
     stopSpeak();
     setFile(f); setResult(null); setError('');
     setPreview(URL.createObjectURL(f));
+    run(f); // tự nhận diện ngay, không cần bấm nút
   };
   const onDrop = (e) => { e.preventDefault(); pick(e.dataTransfer.files?.[0]); };
 
@@ -72,13 +73,14 @@ export default function OcrNumbersPage() {
     } catch { /* tư vấn vẫn hiện dù thiếu nguồn */ }
   };
 
-  const run = async () => {
-    if (!file) return;
+  const run = async (picked) => {
+    const target = picked instanceof File ? picked : file; // tránh nhận nhầm event từ onClick
+    if (!target) return;
     stopSpeak();
     setLoading(true); setError(''); setResult(null);
     try {
       const fd = new FormData();
-      fd.append('file', file);
+      fd.append('file', target);
       const r = await fetch(`${OCR_API}/obituary`, { method: 'POST', body: fd });
       const data = await r.json();
       if (!r.ok) throw new Error(data.detail || `HTTP ${r.status}`);
@@ -189,9 +191,9 @@ export default function OcrNumbersPage() {
       </div>
 
       <div className="mt-3 flex items-center gap-3">
-        <button onClick={run} disabled={!file || loading}
+        <button onClick={() => run()} disabled={!file || loading}
           className="bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg disabled:opacity-50">
-          {loading ? 'Đang nhận diện…' : 'Nhận diện'}
+          {loading ? 'Đang nhận diện…' : 'Nhận diện lại'}
         </button>
         {file && <span className="text-sm text-gray-500 truncate">{file.name}</span>}
       </div>
