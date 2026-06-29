@@ -8,6 +8,7 @@ import CombinationAdvancedPage from "./CombinationAdvancedPage";
 import ClassifyPage from "./ClassifyPage";
 import SpecialsPage from "./SpecialsPage";
 import CombinationGeneratorPage from "./CombinationGeneratorPage"; // THÊM
+import OcrNumbersPage from "./OcrNumbersPage";
 import "./index.css";
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
     { label: "🧮 Phân loại 2 chữ số", path: "/classify" },
     { label: "🏆 Giải đặc biệt", path: "/specials" },
     { label: "🛠️ Sinh tổ hợp (new)", path: "/generate-combinations" }, // THÊM MỤC MỚI
+    { label: "🔢 OCR trích số từ ảnh", path: "/ocr-numbers" },
   ];
 
   return (
@@ -73,6 +75,7 @@ function App() {
             <Route path="/classify" element={<ClassifyPage />} />
             <Route path="/specials" element={<SpecialsPage />} />
             <Route path="/generate-combinations" element={<CombinationGeneratorPage />} /> {/* THÊM ROUTE */}
+            <Route path="/ocr-numbers" element={<OcrNumbersPage />} />
           </Routes>
         </main>
       </div>
