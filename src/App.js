@@ -26,6 +26,7 @@ import CoOccurrencePage from './CoOccurrencePage';
 import ZaloAdminPage from './ZaloAdminPage';
 import GoogleLoginPage from './GoogleLogin';
 import ConvertPage from './ConvertPage';
+import OcrNumbersPage from './OcrNumbersPage';
 import './index.css';
 
 function HeaderSlot() {
@@ -57,6 +58,7 @@ const PAGE_TITLES = {
   '/logsbydevice': 'Logs by Device',
   '/zalo-admin': 'Quản trị Zalo Bot',
   '/convert': 'Chuyển văn bản sang MP3',
+  '/ocr-numbers': 'OCR trích số từ ảnh',
 };
 
 const NAV_ITEMS = [
@@ -82,6 +84,7 @@ const NAV_ITEMS = [
   { label: '📋 Logs', path: '/logs' },
   { label: '📱 Logs by Device', path: '/logsbydevice' },
   { label: '🎵 Chuyển văn bản sang MP3', path: '/convert' },
+  { label: '🔢 OCR trích số từ ảnh', path: '/ocr-numbers' },
 ];
 
 function SettingsModal({ onClose, musicEnabled, setMusicEnabled }) {
@@ -329,6 +332,7 @@ function AppLayout() {
           <Route path="/zalo-admin" element={<ZaloAdminPage />} />
           <Route path="/login" element={<GoogleLoginPage />} />
           <Route path="/convert" element={<ConvertPage />} />
+          <Route path="/ocr-numbers" element={<OcrNumbersPage />} />
         </Routes>
       </main>
     </div>
