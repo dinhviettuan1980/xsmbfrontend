@@ -244,11 +244,17 @@ export default function OcrNumbersPage() {
 
           {/* Tư vấn lô */}
           <div className="border rounded-xl p-3">
-            <div className="text-sm font-semibold text-gray-700 mb-2">🎯 Số từ ảnh trùng cầu/thứ — <span className="text-orange-500">số mũ = ngày gan</span></div>
-            {recommended.length > 0 ? (
-              <div className="flex flex-wrap gap-1.5">{recommended.map((n) => <Chip key={n} num={n} />)}</div>
+            <div className="text-sm font-semibold text-gray-700 mb-2">🔢 Số nhận từ ảnh (2 số cuối) — <span className="text-orange-500">số mũ = ngày gan</span></div>
+            {ocrNums.length === 0 ? (
+              <div className="text-gray-400 text-sm">Không có số.</div>
             ) : (
-              <div className="text-gray-400 text-sm">Không có số nào từ ảnh trùng cầu/thứ hôm nay.</div>
+              <div className="flex flex-wrap gap-1.5">{ocrNums.map((n) => <Chip key={n} num={n} />)}</div>
+            )}
+            {recommended.length > 0 && (
+              <div className="mt-3">
+                <div className="text-xs font-semibold text-red-600 mb-1">⭐ Trùng cầu/thứ — nên đánh:</div>
+                <div className="flex flex-wrap gap-1.5">{recommended.map((n) => <Chip key={n} num={n} />)}</div>
+              </div>
             )}
             <div className="mt-3 pt-2 border-t text-xs text-gray-500 space-y-0.5">
               <div>🃏 Cầu Ông Phong: <b>{ongPhong.join(', ') || '—'}</b></div>
