@@ -16,7 +16,8 @@ const CARD_FIELDS = [
   ['death_date', 'Ngày mất'],
   ['death_time', 'Giờ mất'],
   ['age', 'Hưởng thọ'],
-  ['address', 'Địa chỉ'],
+  ['address', 'Nơi tổ chức lễ viếng/truy điệu'],
+  ['burial_address', 'Nơi an táng'],
   ['visitation_date', 'Lễ viếng (ngày)'],
   ['visitation_time', 'Lễ viếng (giờ)'],
   ['funeral_date', 'Lễ truy điệu (ngày)'],
@@ -223,7 +224,10 @@ export default function OcrNumbersPage() {
               {mp3Loading ? '⏳ Đang tạo…' : '⬇️ Tải MP3'}
             </button>
             {result.map_url && (
-              <a href={result.map_url} target="_blank" rel="noreferrer" className="bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-semibold">📍 Mở bản đồ</a>
+              <a href={result.map_url} target="_blank" rel="noreferrer" className="bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-semibold">📍 Mở bản đồ nơi viếng</a>
+            )}
+            {result.burial_map_url && (
+              <a href={result.burial_map_url} target="_blank" rel="noreferrer" className="bg-indigo-600 text-white px-3 py-2 rounded-lg text-sm font-semibold">⚰️ Mở bản đồ nơi an táng</a>
             )}
           </div>
 
