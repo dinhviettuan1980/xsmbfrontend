@@ -27,6 +27,7 @@ import ZaloAdminPage from './ZaloAdminPage';
 import GoogleLoginPage from './GoogleLogin';
 import ConvertPage from './ConvertPage';
 import OcrNumbersPage from './OcrNumbersPage';
+import CoCaroPage from './CoCaroPage';
 import './index.css';
 
 function HeaderSlot() {
@@ -59,6 +60,7 @@ const PAGE_TITLES = {
   '/zalo-admin': 'Quản trị Zalo Bot',
   '/convert': 'Chuyển văn bản sang MP3',
   '/ocr-numbers': 'OCR trích số từ ảnh',
+  '/co-caro': 'Cờ caro',
 };
 
 const NAV_ITEMS = [
@@ -73,6 +75,7 @@ const NAV_ITEMS = [
   { label: '🔯 Tư vấn số ngày sinh', path: '/numerology' },
   { label: '🎴 Bốc bài may mắn', path: '/tarot' },
   { label: '🃏 Cầu Lô', path: '/cau-lo' },
+  { label: '⭕ Cờ caro', path: '/co-caro' },
   { label: '🔢 Thống kê lô tổng quát', path: '/full-statistic' },
   { label: '🕵️ Số lâu chưa xuất hiện', path: '/longest-absent' },
   { label: '📉 Ngày vắng cực đại', path: '/max-absent-stats' },
@@ -333,6 +336,7 @@ function AppLayout() {
           <Route path="/login" element={<GoogleLoginPage />} />
           <Route path="/convert" element={<ConvertPage />} />
           <Route path="/ocr-numbers" element={<OcrNumbersPage />} />
+          <Route path="/co-caro" element={<CoCaroPage />} />
         </Routes>
       </main>
     </div>
