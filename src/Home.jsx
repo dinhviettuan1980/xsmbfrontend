@@ -52,6 +52,7 @@ function Home() {
   const [weekdayTop6, setWeekdayTop6] = useState([]);
   const [weekdayRecent, setWeekdayRecent] = useState(new Set());
   const [isLive, setIsLive] = useState(false);
+  const [syncing, setSyncing] = useState(false);
   const { setSlot } = useHeaderSlot();
   const dateRef = useRef(date);
   const hasG0Ref = useRef(false);
@@ -97,17 +98,41 @@ function Home() {
     return () => clearInterval(t);
   }, [isLive]);
 
+  const handleSync = async () => {
+    if (syncing) return;
+    setSyncing(true);
+    try {
+      const baseUrl = process.env.REACT_APP_API_BASE;
+      await apiClient.get(`${baseUrl}/api/history/bulk`);
+      await fetchData(dateRef.current);
+    } catch (err) {
+      console.error("Lỗi đồng bộ lại:", err);
+    } finally {
+      setSyncing(false);
+    }
+  };
+
   useEffect(() => {
     setSlot(
-      <input
-        type="date"
-        value={date}
-        onChange={(e) => setDate(e.target.value)}
-        className="bg-white text-red-700 rounded-lg px-2 py-1 text-sm font-semibold focus:outline-none border-0 cursor-pointer"
-      />
+      <div className="flex items-center gap-2">
+        <input
+          type="date"
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
+          className="bg-white text-red-700 rounded-lg px-2 py-1 text-sm font-semibold focus:outline-none border-0 cursor-pointer"
+        />
+        <button
+          type="button"
+          onClick={handleSync}
+          disabled={syncing}
+          className="bg-white text-red-700 rounded-lg px-2 py-1 text-sm font-semibold disabled:opacity-60"
+        >
+          {syncing ? "Đang đồng bộ..." : "Đồng bộ lại"}
+        </button>
+      </div>
     );
     return () => setSlot(null);
-  }, [date]);
+  }, [date, syncing]);
 
   useEffect(() => {
     if (date) fetchData(date);
